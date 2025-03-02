@@ -1,0 +1,137 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "admin",
+      "password": "admin123",
+      "role": "admin",
+      "personalInfo": {
+        "fullName": "Nguyễn Văn A",
+        "dateOfBirth": "1990-01-01",
+        "address": "123 Cầu giấy, Hà Nội",
+        "phone": "0901234567",
+        "job": "Quản trị"
+      }
+    },
+    {
+      "id": 2,
+      "username": "thukho",
+      "password": "thukho123",
+      "role": "stockkeeper",
+      "personalInfo": {
+        "fullName": "Trần Thị A",
+        "dateOfBirth": "1992-05-15",
+        "address": "Đường láng, Hà Nội",
+        "phone": "0912345678",
+        "job": "Thủ kho"
+      }
+    },
+    {
+      "id": 3,
+      "username": "banhang",
+      "password": "banhang123",
+      "role": "sales",
+      "personalInfo": {
+        "fullName": "Lê Văn A",
+        "dateOfBirth": "1995-08-20",
+        "address": "789 Mỹ Đình, Hà Nội",
+        "phone": "0923456789",
+        "job": "Bán hàng"
+      }
+    },
+    {
+      "id": 4,
+      "username": "kinhdoanh",
+      "password": "kinhdoanh123",
+      "role": "business",
+      "personalInfo": {
+        "fullName": "Phạm Thị A",
+        "dateOfBirth": "1993-03-10",
+        "address": "101 Mễ Trì, Hà Nội",
+        "phone": "0934567890",
+        "job": "business"
+      }
+    },
+    {
+      "id": 5,
+      "username": "khachhang",
+      "password": "khachhang123",
+      "role": "customer",
+      "personalInfo": {
+        "fullName": "Nguyễn Văn Anh",
+        "dateOfBirth": "1998-12-25",
+        "address": "111 Đường Láng, Hà Nội",
+        "phone": "0945678901",
+        "job": "Tự do"
+      }
+    }
+  ],
+  "phones": [
+    {
+      "id": 1,
+      "name": "iPhone 14 Pro",
+      "image": "https://example.com/iphone14pro.jpg",
+      "price": 25990000,
+      "cpu": "A16 Bionic",
+      "storage": "256GB",
+      "os": "iOS 16",
+      "battery": "3200mAh",
+      "screenSize": "6.1 inch",
+      "camera": "48MP + 12MP + 12MP",
+      "color": "Space Black",
+      "quantity": 50,
+      "description": "Điện thoại cao cấp từ Apple"
+    },
+    {
+      "id": 2,
+      "name": "Samsung Galaxy S23",
+      "image": "https://example.com/galaxys23.jpg",
+      "price": 22990000,
+      "cpu": "Snapdragon 8 Gen 2",
+      "storage": "128GB",
+      "os": "Android 13",
+      "battery": "3900mAh",
+      "screenSize": "6.1 inch",
+      "camera": "50MP + 12MP + 10MP",
+      "color": "Phantom Black",
+      "quantity": 75,
+      "description": "Flagship mới nhất từ Samsung"
+    }
+  ],
+  "suppliers": [
+    {
+      "id": 1,
+      "supplierCode": "NCC001",
+      "name": "Công ty TNHH Apple Việt Nam",
+      "address": "123 Đường Lê Lợi, TP.HCM",
+      "phone": "02812345678",
+      "email": "applevn@gmail.com"
+    },
+    {
+      "id": 2,
+      "supplierCode": "NCC002",
+      "name": "Samsung Electronics",
+      "address": "456 Đường Hàn Thuyên, Hà Nội",
+      "phone": "02498765432",
+      "email": "samsungvn@samsung.com"
+    }
+  ],
+  "customers": [
+    {
+      "id": 1,
+      "fullName": "Nguyễn Thị Mai",
+      "phone": "0971234567",
+      "address": "789 Đường Láng, Hà Nội",
+      "age": 25,
+      "email": "mai.nt@gmail.com"
+    },
+    {
+      "id": 2,
+      "fullName": "Trần Văn Hùng",
+      "phone": "0987654321",
+      "address": "101 Đường Trần Phú, TP.HCM",
+      "age": 30,
+      "email": "hung.tv@gmail.com"
+    }
+  ]
+}
