@@ -7,12 +7,12 @@ import Header from "../Header/Header";
 function Master() {
   return (
     <>
-      <Row>
-        <Header />
-        <Body />
-        <Footer />
-        <Outlet />
-      </Row>
+      {/* <Row>
+      </Row> */}
+      <Header />
+      <Body />
+      <Footer />
+      <Outlet />
     </>
   );
 }

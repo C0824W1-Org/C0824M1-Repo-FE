@@ -1,0 +1,35 @@
+.nav {
+  font-family: "Roboto", sans-serif;
+  background: #be1e2d;
+  height: 64px;
+  color: #fff;
+}
+
+.color-white {
+  font-size: 12px;
+  padding: 10px;
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity));
+}
+
+/* Đảm bảo SVG không bị thu nhỏ */
+.nav svg {
+  min-width: 24px; /* Kích thước tối thiểu không đổi */
+  min-height: 24px;
+  flex-shrink: 0; /* Ngăn SVG co lại trong flex container */
+}
+
+/* Điều chỉnh Nav.Link khi màn hình nhỏ */
+@media (max-width: 992px) {
+  /* Breakpoint của Bootstrap cho mobile */
+  .nav .nav-link {
+    display: flex;
+    align-items: center;
+    padding: 5px 10px; /* Giảm padding nếu cần */
+  }
+
+  .color-white {
+    font-size: 14px; /* Giảm font-size trên mobile nếu muốn */
+    padding: 5px; /* Giảm padding cho text */
+  }
+}
