@@ -1,0 +1,56 @@
+/* Tạo layout 5 cột trên màn hình xl */
+@media (min-width: 1200px) {
+  .custom-col-xl-5 {
+    flex: 0 0 20%; /* Mỗi cột chiếm 20% chiều rộng */
+    max-width: 20%;
+    min-height: 408px;
+  }
+}
+
+.products {
+  font-family: "Roboto", sans-serif;
+}
+
+.card-img-container {
+  height: 200px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-img {
+  margin-top: 40px;
+  width: 180px;
+  height: 180px;
+  object-fit: cover;
+}
+
+.product-title {
+  margin-top: 20px;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.product-price {
+  margin-top: 20px;
+  font-size: 17px;
+  line-height: 24px;
+  font-weight: 700;
+  --tw-text-opacity: 1;
+  color: rgb(190 30 45 / var(--tw-text-opacity));
+}
+
+.sort-active {
+  color: rgb(190, 30, 45);
+}
+
+.sort-inactive {
+  color: #6c757d; /* Màu xám của text-secondary */
+}
+
+/* Đảm bảo thẻ Card có hiệu ứng bóng đổ khi hover */
+.products-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Bóng đổ nhẹ */
+  transition: box-shadow 0.3s ease-in-out; /* Hiệu ứng mượt mà */
+}
