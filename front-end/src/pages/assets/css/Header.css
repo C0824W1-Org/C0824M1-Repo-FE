@@ -3,33 +3,84 @@
   background: #be1e2d;
   height: 64px;
   color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
 }
 
+/* Styling cho text trong nav */
 .color-white {
   font-size: 12px;
-  padding: 10px;
-  --tw-text-opacity: 1;
-  color: rgb(255 255 255 / var(--tw-text-opacity));
+  padding: 0 10px;
+  color: rgba(255, 255, 255, 1);
+  transition: all 0.2s ease-in-out;
 }
 
-/* Đảm bảo SVG không bị thu nhỏ */
+/* Đảm bảo SVG không bị thu nhỏ và có khoảng cách */
 .nav svg {
-  min-width: 24px; /* Kích thước tối thiểu không đổi */
+  min-width: 24px;
   min-height: 24px;
-  flex-shrink: 0; /* Ngăn SVG co lại trong flex container */
+  flex-shrink: 0;
+  margin-right: 8px; /* Thêm khoảng cách với text */
 }
 
-/* Điều chỉnh Nav.Link khi màn hình nhỏ */
-@media (max-width: 992px) {
-  /* Breakpoint của Bootstrap cho mobile */
+/* Responsive adjustments */
+@media (max-width: 991px) {
+  /* Sử dụng breakpoint của Bootstrap (lg) */
+  .nav {
+    height: auto; /* Cho phép height tự điều chỉnh trên mobile */
+    padding: 0.5rem 0;
+  }
+
+  .navbar-collapse {
+    background: #be1e2d; /* Giữ màu nền nhất quán */
+    padding: 1rem;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-height: calc(100vh - 64px); /* Giới hạn chiều cao */
+    overflow-y: auto; /* Cho phép scroll nếu nội dung dài */
+  }
+
   .nav .nav-link {
     display: flex;
     align-items: center;
-    padding: 5px 10px; /* Giảm padding nếu cần */
+    padding: 8px 15px;
+    border-radius: 4px;
+    margin: 2px 0;
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  .nav .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1); /* Hiệu ứng hover */
   }
 
   .color-white {
-    font-size: 14px; /* Giảm font-size trên mobile nếu muốn */
-    padding: 5px; /* Giảm padding cho text */
+    font-size: 14px; /* Tăng kích thước chữ trên mobile cho dễ đọc */
+    padding: 0 5px;
+  }
+
+  /* Điều chỉnh form tìm kiếm trên mobile */
+  .navbar form {
+    margin: 0.5rem 1rem !important;
+    width: calc(100% - 2rem);
+  }
+
+  .navbar .form-control {
+    width: 100% !important;
+    margin: 0 !important;
+  }
+}
+
+/* Desktop adjustments */
+@media (min-width: 992px) {
+  .nav .nav-link {
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    height: 100%;
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  .nav .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
   }
 }
