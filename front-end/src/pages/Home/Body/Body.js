@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
+import { Container, Row, Col, Card } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import banner1 from "../../assets/img/banner-1.jpg";
 import banner2 from "../../assets/img/banner-2.png";
 import banner3 from "../../assets/img/banner-3.png";
 import banner4 from "../../assets/img/banner-4.jpg";
-import ip16 from "../../assets/img/ip16.avif";
 import "../../assets/css/Body.css";
 import PhonesService from "../../../services/Phones.service.js";
 
@@ -14,6 +13,7 @@ function Body() {
   const [sortBy, setSortBy] = useState("featured");
   const [currentImage, setCurrentImage] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   const images = [banner1, banner2, banner3, banner4];
 
@@ -21,9 +21,11 @@ function Body() {
     const fetchPhones = async () => {
       try {
         const response = await PhonesService.getAllPhones();
-        setPhones(response.data);
+        setPhones(Array.isArray(response) ? response : []);
       } catch (error) {
         console.error("Lỗi khi lấy dữ liệu điện thoại:", error);
+      } finally {
+        setLoading(false); // Kết thúc loading
       }
     };
     fetchPhones();
@@ -61,6 +63,10 @@ function Body() {
   const handleClose = () => {
     setIsVisible(false);
   };
+
+  if (loading) {
+    return <div>Đang tải dữ liệu...</div>;
+  }
 
   return (
     <>

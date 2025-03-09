@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
 import { Container, Navbar, Nav, Form, FormControl } from "react-bootstrap";
+import { Link } from "react-router"; // Import Link
 import logo from "../../assets/img/logo.svg";
 import "../../assets/css/Header.css";
 
@@ -57,7 +57,8 @@ function Header() {
             </Nav.Link>
 
             <Nav.Link
-              href="#login"
+              as={Link}
+              to="/store"
               className="text-dark d-flex align-items-center my-1 my-lg-0 me-lg-3"
               onClick={() => setExpanded(false)}
             >
@@ -76,7 +77,8 @@ function Header() {
             </Nav.Link>
 
             <Nav.Link
-              href="#login"
+              as={Link}
+              to="/login"
               className="text-dark d-flex align-items-center my-1 my-lg-0 me-lg-3"
               onClick={() => setExpanded(false)}
             >
@@ -94,7 +96,8 @@ function Header() {
             </Nav.Link>
 
             <Nav.Link
-              href="#cart"
+              as={Link}
+              to="/cart"
               className="text-dark d-flex align-items-center my-1 my-lg-0 me-lg-3"
               onClick={() => setExpanded(false)}
             >
