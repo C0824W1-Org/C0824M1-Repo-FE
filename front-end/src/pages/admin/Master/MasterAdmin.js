@@ -3,11 +3,11 @@ import Sidebar from "../Sidebar/Sidebar";
 import Header from "../Header/Header";
 import DashboardContent from "../Body/DashboardContent";
 import "../../assets/css/MasterAdmin.css";
-// import PersonalInfo from "../../../components/Profile/PersonalInfo/PersonalInfo";
-// import EmployeeList from "../../../components/Employees/EmployeeList/EmployeeList";
-// import ProductList from "../../../components/Products/ProductList/ProductList";
-// import SupplierManagement from "../../../components/Suppliers/SupplierManagement/SupplierManagement";
-// import SalesManagement from "../../../components/Sales/SalesManagement/SalesManagement";
+import ViewsProfile from "../../../components/Profile/ViewsProfile/ViewsProfile";
+import ListMembers from "../../../components/Members/ListMembers/ListMembers";
+import ListProducts from "../../../components/Products/ListProducts/ListProducts";
+import ListSuppliers from "../../../components/Suppliers/ListSuppliers/ListSuppliers";
+import SalesManagement from "../../../components/SalesManagement/SalesManagement";
 import { useSelector } from "react-redux";
 
 const MasterAdmin = () => {
@@ -31,16 +31,16 @@ const MasterAdmin = () => {
     switch (currentPage) {
       case "dashboard":
         return <DashboardContent />;
-      // case "personalInfo":
-      //   return <PersonalInfo />;
-      // case "employees":
-      //   return <EmployeeList />;
-      // case "products":
-      //   return <ProductList />;
-      // case "suppliers":
-      //   return <SupplierManagement />;
-      // case "sales":
-      //   return <SalesManagement />;
+      case "ViewsProfile":
+        return <ViewsProfile />;
+      case "ListMembers":
+        return <ListMembers />;
+      case "ListProducts":
+        return <ListProducts />;
+      case "ListSuppliers":
+        return <ListSuppliers />;
+      case "SalesManagement":
+        return <SalesManagement />;
       default:
         return <DashboardContent />;
     }
