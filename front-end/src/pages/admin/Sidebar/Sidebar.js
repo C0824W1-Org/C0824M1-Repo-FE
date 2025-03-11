@@ -2,7 +2,6 @@ import React from "react";
 import {
   FaHome,
   FaUsers,
-  FaChartLine,
   FaCog,
   FaSignOutAlt,
   FaUser,
@@ -12,7 +11,6 @@ import {
 } from "react-icons/fa";
 
 const Sidebar = ({ isSidebarOpen, onPageChange, currentPage, userRole }) => {
-  // Danh sách menu dựa trên vai trò của người dùng
   const menuItems = [
     {
       name: "dashboard",
@@ -21,31 +19,31 @@ const Sidebar = ({ isSidebarOpen, onPageChange, currentPage, userRole }) => {
       roles: ["admin", "stockkeeper", "sales", "business"],
     },
     {
-      name: "personalInfo",
+      name: "ViewsProfile",
       icon: FaUser,
       label: "Thông tin cá nhân",
       roles: ["admin", "stockkeeper", "sales", "business"],
     },
     {
-      name: "employees",
+      name: "ListMembers",
       icon: FaUsers,
       label: "Danh sách nhân viên",
       roles: ["admin"],
     },
     {
-      name: "products",
+      name: "ListProducts",
       icon: FaBox,
       label: "Danh sách hàng hóa",
       roles: ["admin", "business"],
     },
     {
-      name: "suppliers",
+      name: "ListSuppliers",
       icon: FaTruck,
       label: "Quản lý nhà cung cấp",
       roles: ["admin", "stockkeeper"],
     },
     {
-      name: "sales",
+      name: "SalesManagement",
       icon: FaShoppingCart,
       label: "Quản lý bán hàng",
       roles: ["admin", "sales", "business"],
@@ -53,7 +51,6 @@ const Sidebar = ({ isSidebarOpen, onPageChange, currentPage, userRole }) => {
     { name: "settings", icon: FaCog, label: "Settings", roles: ["admin"] },
   ];
 
-  // Lọc menu dựa trên vai trò của người dùng
   const filteredMenuItems = menuItems.filter((item) =>
     item.roles.includes(userRole)
   );
