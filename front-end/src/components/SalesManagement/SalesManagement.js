@@ -36,7 +36,7 @@ const ViewsProfile = () => {
                 <td>
                   <button className="btn btn-sm btn-primary me-2">Edit</button>
                   <button className="btn btn-sm btn-danger">
-                    Delete2222222222
+                    Delet1111111e
                   </button>
                 </td>
               </tr>

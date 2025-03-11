@@ -1,45 +1,54 @@
 import React from "react";
+import { useSelector } from "react-redux";
 
-const ViewsProfile = () => {
+const ViewsProfile = ({ onPageChange }) => {
+  const { userLogin } = useSelector((state) => state.auth);
+
+  // Kiểm tra nếu không có thông tin người dùng
+  if (!userLogin || Object.keys(userLogin).length === 0) {
+    return <div>Không có thông tin người dùng. Vui lòng đăng nhập lại.</div>;
+  }
+
+  const { personalInfo, username, role } = userLogin;
+
+  // Xử lý khi nhấn nút "Chỉnh sửa"
+  const handleEditClick = () => {
+    onPageChange("editProfile"); // Chuyển sang trang EditProfile
+  };
+
   return (
     <div className="content container-fluid">
-      <h2>Users Management</h2>
       <div className="card">
         <div className="card-body">
-          <h5 className="card-title">User List</h5>
-          <table className="table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
+          <h5 className="card-title">Thông tin người dùng</h5>
+          <table className="table table-bordered">
             <tbody>
               <tr>
-                <td>1</td>
-                <td>John Doe</td>
-                <td>john@example.com</td>
-                <td>Admin</td>
-                <td>
-                  <button className="btn btn-sm btn-primary me-2">Edit</button>
-                  <button className="btn btn-sm btn-danger">Delete</button>
-                </td>
+                <th scope="row">Họ và tên</th>
+                <td>{personalInfo.fullName}</td>
               </tr>
               <tr>
-                <td>2</td>
-                <td>Jane Smith</td>
-                <td>jane@example.com</td>
-                <td>User</td>
-                <td>
-                  <button className="btn btn-sm btn-primary me-2">Edit</button>
-                  <button className="btn btn-sm btn-danger">Delete</button>
-                </td>
+                <th scope="row">Ngày sinh</th>
+                <td>{personalInfo.dateOfBirth}</td>
               </tr>
+              <tr>
+                <th scope="row">Địa chỉ</th>
+                <td>{personalInfo.address}</td>
+              </tr>
+              <tr>
+                <th scope="row">Số điện thoại</th>
+                <td>{personalInfo.phone}</td>
+              </tr>
+              <tr>
+                <th scope="row">Chức vụ</th>
+                <td>{personalInfo.job}</td>
+              </tr>
+              <tr></tr>
             </tbody>
           </table>
+          <button className="btn btn-primary mt-3" onClick={handleEditClick}>
+            Chỉnh sửa thông tin
+          </button>
         </div>
       </div>
     </div>

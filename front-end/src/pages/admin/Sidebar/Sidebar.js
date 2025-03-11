@@ -2,7 +2,6 @@ import React from "react";
 import {
   FaHome,
   FaUsers,
-  FaChartLine,
   FaCog,
   FaSignOutAlt,
   FaUser,
@@ -12,7 +11,6 @@ import {
 } from "react-icons/fa";
 
 const Sidebar = ({ isSidebarOpen, onPageChange, currentPage, userRole }) => {
-  // Danh sách menu dựa trên vai trò của người dùng
   const menuItems = [
     {
       name: "dashboard",
@@ -53,7 +51,6 @@ const Sidebar = ({ isSidebarOpen, onPageChange, currentPage, userRole }) => {
     { name: "settings", icon: FaCog, label: "Settings", roles: ["admin"] },
   ];
 
-  // Lọc menu dựa trên vai trò của người dùng
   const filteredMenuItems = menuItems.filter((item) =>
     item.roles.includes(userRole)
   );

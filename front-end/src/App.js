@@ -16,7 +16,7 @@ function App() {
   // const [loading, setLoading] = useState(true);
 
   // useEffect(() => {
-  //   // Giả sử bạn cần thời gian để kiểm tra trạng thái đăng nhập
+  // Giả sử bạn cần thời gian để kiểm tra trạng thái đăng nhập
   //   const timer = setTimeout(() => {
   //     setLoading(false);
   //   }, 1000); // Thời gian giả lập loading
