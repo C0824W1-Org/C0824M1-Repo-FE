@@ -103,72 +103,99 @@ const ListSuppliers = () => {
   }
 
   return (
-    <div className="content container-fluid p-4">
-      <div className="card shadow-sm">
+    <div className="container py-4">
+      <div className="card shadow-lg rounded-3 border-0">
         <div className="card-body">
-          <h5 className="card-title mb-4">Danh sách nhà cung cấp</h5>
-          <button
-            className="btn btn-primary d-flex align-items-center gap-2 mb-4"
-            onClick={handleAdd}
-          >
-            <FaPlus /> Thêm nhà cung cấp
-          </button>
-          <div className="d-flex gap-2 mb-4">
-            <input
-              type="text"
-              className="form-control flex-grow-1"
-              name="name"
-              placeholder="Tìm theo tên"
-              value={searchCriteria.name}
-              onChange={handleSearchChange}
-            />
-            <input
-              type="text"
-              className="form-control flex-grow-1"
-              name="phone"
-              placeholder="Tìm theo số điện thoại"
-              value={searchCriteria.phone}
-              onChange={handleSearchChange}
-            />
-            <input
-              type="text"
-              className="form-control flex-grow-1"
-              name="email"
-              placeholder="Tìm theo email"
-              value={searchCriteria.email}
-              onChange={handleSearchChange}
-            />
+          <h4 className="card-title text-center text-primary fw-bold mb-4">
+            Danh sách nhà cung cấp
+          </h4>
+          <div className="d-flex flex-wrap gap-3 mb-4 justify-content-center">
+            <button
+              className="btn btn-primary fw-bold px-4 py-2 d-flex align-items-center gap-2"
+              onClick={handleAdd}
+            >
+              <FaPlus /> Thêm nhà cung cấp
+            </button>
+            <div className="input-group w-auto shadow-sm">
+              <span className="input-group-text">
+                <i className="bi bi-search"></i>
+              </span>
+              <input
+                type="text"
+                className="form-control"
+                name="name"
+                placeholder="Tìm theo tên"
+                value={searchCriteria.name}
+                onChange={handleSearchChange}
+              />
+            </div>
+            <div className="input-group w-auto shadow-sm">
+              <span className="input-group-text">
+                <i className="bi bi-telephone"></i>
+              </span>
+              <input
+                type="text"
+                className="form-control"
+                name="phone"
+                placeholder="Tìm theo số điện thoại"
+                value={searchCriteria.phone}
+                onChange={handleSearchChange}
+              />
+            </div>
+            <div className="input-group w-auto shadow-sm">
+              <span className="input-group-text">
+                <i className="bi bi-envelope"></i>
+              </span>
+              <input
+                type="text"
+                className="form-control"
+                name="email"
+                placeholder="Tìm theo email"
+                value={searchCriteria.email}
+                onChange={handleSearchChange}
+              />
+            </div>
           </div>
           <div className="table-responsive">
-            <table className="table table-bordered table-hover">
-              <thead>
+            <table className="table table-hover table-bordered align-middle text-center">
+              <thead className="table-light">
                 <tr>
-                  <th className="fw-bold">Mã nhà cung cấp</th>
-                  <th className="fw-bold">Tên</th>
-                  <th className="fw-bold">Địa chỉ</th>
-                  <th className="fw-bold">Số điện thoại</th>
-                  <th className="fw-bold">Email</th>
-                  <th className="fw-bold">Hành động</th>
+                  <th className="fw-bold text-center">Mã nhà cung cấp</th>
+                  <th className="fw-bold text-center">Tên</th>
+                  <th className="fw-bold text-center">Địa chỉ</th>
+                  <th className="fw-bold text-center">Số điện thoại</th>
+                  <th className="fw-bold text-center">Email</th>
+                  <th className="fw-bold text-center">Hành động</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredSuppliers.map((supplier) => (
-                  <tr key={supplier.id} className="hover-effect">
-                    <td>{supplier.supplierCode}</td>
-                    <td>{supplier.name}</td>
-                    <td>{supplier.address}</td>
-                    <td>{supplier.phone}</td>
-                    <td>{supplier.email}</td>
-                    <td>
-                      <div className="d-flex gap-2">
+                  <tr key={supplier.id}>
+                    <td className="text-center align-middle">
+                      {supplier.supplierCode}
+                    </td>
+                    <td className="text-center align-middle">
+                      {supplier.name}
+                    </td>
+                    <td className="text-center align-middle">
+                      {supplier.address}
+                    </td>
+                    <td className="text-center align-middle">
+                      {supplier.phone}
+                    </td>
+                    <td className="text-center align-middle">
+                      {supplier.email}
+                    </td>
+                    <td className="text-center align-middle">
+                      <div className="d-flex gap-2 justify-content-center">
                         <button
-                          className="btn btn-warning btn-sm d-flex align-items-center gap-1"
+                          className="btn btn-warning btn-sm d-flex align-items-center gap-1 shadow-sm"
                           onClick={() => handleEdit(supplier.id)}
                         >
                           <FaEdit />
                         </button>
                         <button
-                          className="btn btn-danger btn-sm d-flex align-items-center gap-1"
+                          className="btn btn-danger btn-sm d-flex align-items-center gap-1 shadow-sm"
                           onClick={() => handleShowDeleteModal(supplier.id)}
                         >
                           <FaTrash />
@@ -183,12 +210,13 @@ const ListSuppliers = () => {
         </div>
       </div>
 
-      <Modal show={showDeleteModal} onHide={handleCloseDeleteModal}>
+      <Modal show={showDeleteModal} onHide={handleCloseDeleteModal} centered>
         <Modal.Header closeButton>
           <Modal.Title>Xác nhận xóa</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Bạn có chắc chắn muốn xóa nhà cung cấp này không?
+          Bạn có chắc chắn muốn xóa nhà cung cấp này không? Hành động này không
+          thể hoàn tác.
         </Modal.Body>
         <Modal.Footer>
           <Button

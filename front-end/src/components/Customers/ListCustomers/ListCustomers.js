@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import CustomersService from "../../../services/Customers.service";
 import { toast } from "react-toastify";
+import { Modal, Button } from "react-bootstrap";
 
 const ListCustomers = () => {
   const navigate = useNavigate();
@@ -13,6 +14,8 @@ const ListCustomers = () => {
     fullName: "",
     phone: "",
   });
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [customerToDelete, setCustomerToDelete] = useState(null);
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -57,13 +60,20 @@ const ListCustomers = () => {
     setFilteredCustomers(filtered);
   }, [searchCriteria, customers]);
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa khách hàng này?")) {
+  const handleDeleteClick = (id) => {
+    setCustomerToDelete(id);
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (customerToDelete) {
       try {
-        await CustomersService.deleteCustomer(id);
-        setCustomers((prev) => prev.filter((customer) => customer.id !== id));
+        await CustomersService.deleteCustomer(customerToDelete);
+        setCustomers((prev) =>
+          prev.filter((customer) => customer.id !== customerToDelete)
+        );
         setFilteredCustomers((prev) =>
-          prev.filter((customer) => customer.id !== id)
+          prev.filter((customer) => customer.id !== customerToDelete)
         );
         toast.success("Xóa khách hàng thành công!");
       } catch (err) {
@@ -71,94 +81,134 @@ const ListCustomers = () => {
         console.error("Lỗi khi xóa khách hàng:", err);
       }
     }
+    setShowDeleteModal(false);
+    setCustomerToDelete(null);
+  };
+
+  const handleCloseModal = () => {
+    setShowDeleteModal(false);
+    setCustomerToDelete(null);
   };
 
   const handleAdd = () => {
-    navigate("/admin/add-customers"); // Sửa thành đường dẫn đầy đủ
+    navigate("/admin/add-customers");
   };
 
   const handleEdit = (id) => {
-    navigate(`/admin/edit-customers/${id}`); // Sửa thành đường dẫn đầy đủ
+    navigate(`/admin/edit-customers/${id}`);
   };
 
   if (loading) {
-    return <div>Đang tải danh sách khách hàng...</div>;
+    return (
+      <div className="text-center py-5">Đang tải danh sách khách hàng...</div>
+    );
   }
 
   if (error) {
-    return <div>{error}</div>;
+    return <div className="alert alert-danger text-center">{error}</div>;
   }
 
   return (
-    <div className="content container-fluid">
-      <h2>Danh sách khách hàng</h2>
-      <div className="card">
+    <div className="container py-4">
+      <div className="card shadow-lg rounded-3 border-0">
         <div className="card-body">
-          <h5 className="card-title">Danh sách khách hàng</h5>
-          <div className="d-flex gap-2 mb-3">
-            <button className="btn btn-primary" onClick={handleAdd}>
-              Thêm khách hàng
+          <h4 className="card-title text-center text-primary fw-bold mb-4">
+            Danh sách khách hàng
+          </h4>
+          <div className="d-flex flex-wrap gap-3 mb-4 justify-content-center">
+            <button
+              className="btn btn-primary fw-bold px-4 py-2"
+              onClick={handleAdd}
+            >
+              <i className="bi bi-person-plus-fill me-2"></i>Thêm khách hàng
             </button>
-            <input
-              type="text"
-              className="form-control"
-              name="fullName"
-              placeholder="Tìm theo họ và tên"
-              value={searchCriteria.fullName}
-              onChange={handleSearchChange}
-            />
-            <input
-              type="text"
-              className="form-control"
-              name="phone"
-              placeholder="Tìm theo số điện thoại"
-              value={searchCriteria.phone}
-              onChange={handleSearchChange}
-            />
+            <div className="input-group w-auto shadow-sm">
+              <span className="input-group-text">
+                <i className="bi bi-search"></i>
+              </span>
+              <input
+                type="text"
+                className="form-control"
+                name="fullName"
+                placeholder="Tìm theo họ và tên"
+                value={searchCriteria.fullName}
+                onChange={handleSearchChange}
+              />
+            </div>
+            <div className="input-group w-auto shadow-sm">
+              <span className="input-group-text">
+                <i className="bi bi-telephone"></i>
+              </span>
+              <input
+                type="text"
+                className="form-control"
+                name="phone"
+                placeholder="Tìm theo số điện thoại"
+                value={searchCriteria.phone}
+                onChange={handleSearchChange}
+              />
+            </div>
           </div>
-          {filteredCustomers.length === 0 ? (
-            <p>Không có khách hàng nào phù hợp với tiêu chí tìm kiếm.</p>
-          ) : (
-            <table className="table table-bordered table-hover">
-              <thead>
+          <div className="table-responsive">
+            <table className="table table-hover table-bordered align-middle text-center">
+              <thead className="table-light">
                 <tr>
-                  <th>Họ và tên</th>
-                  <th>Số điện thoại</th>
-                  <th>Địa chỉ</th>
-                  <th>Tuổi</th>
-                  <th>Email</th>
-                  <th>Actions</th>
+                  <th className="fw-bold text-center">Họ và tên</th>
+                  <th className="fw-bold text-center">Số điện thoại</th>
+                  <th className="fw-bold text-center">Địa chỉ</th>
+                  <th className="fw-bold text-center">Tuổi</th>
+                  <th className="fw-bold text-center">Email</th>
+                  <th className="fw-bold text-center">Hành động</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredCustomers.map((customer) => (
                   <tr key={customer.id}>
-                    <td>{customer.fullName}</td>
-                    <td>{customer.phone}</td>
-                    <td>{customer.address}</td>
-                    <td>{customer.age}</td>
-                    <td>{customer.email || "-"}</td>
-                    <td>
+                    <td className="text-center">{customer.fullName}</td>
+                    <td className="text-center">{customer.phone}</td>
+                    <td className="text-center">{customer.address}</td>
+                    <td className="text-center">{customer.age}</td>
+                    <td className="text-center">{customer.email || "-"}</td>
+                    <td className="text-center">
                       <button
-                        className="btn btn-warning btn-sm me-2"
+                        className="btn btn-warning btn-sm me-2 shadow-sm"
                         onClick={() => handleEdit(customer.id)}
                       >
-                        Sửa
+                        <i className="bi bi-pencil-fill"></i>
                       </button>
                       <button
-                        className="btn btn-danger btn-sm"
-                        onClick={() => handleDelete(customer.id)}
+                        className="btn btn-danger btn-sm shadow-sm"
+                        onClick={() => handleDeleteClick(customer.id)}
                       >
-                        Xóa
+                        <i className="bi bi-trash-fill"></i>
                       </button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          )}
+          </div>
         </div>
       </div>
+
+      {/* Modal xác nhận xóa */}
+      <Modal show={showDeleteModal} onHide={handleCloseModal} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Xác nhận xóa khách hàng</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Bạn có chắc chắn muốn xóa khách hàng này không? Hành động này không
+          thể hoàn tác.
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="danger" onClick={handleConfirmDelete}>
+            Xác nhận
+          </Button>
+          <Button variant="secondary" onClick={handleCloseModal}>
+            Hủy
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

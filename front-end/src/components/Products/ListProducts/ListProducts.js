@@ -122,57 +122,69 @@ const ListProducts = () => {
   }
 
   return (
-    <div className="content container-fluid p-4">
-      <div className="card shadow-sm">
+    <div className="container py-4">
+      <div className="card shadow-lg rounded-3 border-0">
         <div className="card-body">
-          <h5 className="card-title mb-4">Danh sách hàng hóa</h5>
-          <button
-            className="btn btn-primary d-flex align-items-center gap-2 mb-4"
-            onClick={handleAdd}
-          >
-            <FaPlus /> Thêm hàng hóa
-          </button>
-          <div className="d-flex gap-2 mb-4">
-            <input
-              type="text"
-              className="form-control flex-grow-1"
-              name="name"
-              placeholder="Tìm theo tên"
-              value={searchCriteria.name}
-              onChange={handleSearchChange}
-            />
-            <select
-              className="form-control flex-grow-1"
-              name="brand"
-              value={searchCriteria.brand}
-              onChange={handleSearchChange}
+          <h4 className="card-title text-center text-primary fw-bold mb-4">
+            Danh sách hàng hóa
+          </h4>
+          <div className="d-flex flex-wrap gap-3 mb-4 justify-content-center">
+            <button
+              className="btn btn-primary fw-bold px-4 py-2 d-flex align-items-center gap-2"
+              onClick={handleAdd}
             >
-              <option value="">Tất cả hãng</option>
-              <option value="Apple">Apple</option>
-              <option value="Samsung">Samsung</option>
-              <option value="Oppo">Oppo</option>
-              <option value="Nokia">Nokia</option>
-              <option value="Pixel">Pixel</option>
-              <option value="Vivo">Vivo</option>
-            </select>
+              <FaPlus /> Thêm hàng hóa
+            </button>
+            <div className="input-group w-auto shadow-sm">
+              <span className="input-group-text">
+                <i className="bi bi-search"></i>
+              </span>
+              <input
+                type="text"
+                className="form-control"
+                name="name"
+                placeholder="Tìm theo tên"
+                value={searchCriteria.name}
+                onChange={handleSearchChange}
+              />
+            </div>
+            <div className="input-group w-auto shadow-sm">
+              <span className="input-group-text">
+                <i className="bi bi-tag"></i>
+              </span>
+              <select
+                className="form-select"
+                name="brand"
+                value={searchCriteria.brand}
+                onChange={handleSearchChange}
+              >
+                <option value="">Tất cả hãng</option>
+                <option value="Apple">Apple</option>
+                <option value="Samsung">Samsung</option>
+                <option value="Oppo">Oppo</option>
+                <option value="Nokia">Nokia</option>
+                <option value="Pixel">Pixel</option>
+                <option value="Vivo">Vivo</option>
+              </select>
+            </div>
           </div>
           <div className="table-responsive">
-            <table className="table table-bordered table-hover">
-              <thead>
+            <table className="table table-hover table-bordered align-middle text-center">
+              <thead className="table-light">
                 <tr>
-                  <th className="text-center fw-bold">Ảnh</th>
-                  <th className="text-center fw-bold">Tên</th>
-                  <th className="text-center fw-bold">Hãng</th>
-                  <th className="text-center fw-bold">CPU</th>
-                  <th className="text-center fw-bold">Số lượng</th>
-                  <th className="text-center fw-bold">Hệ điều hành</th>
-                  <th className="text-center fw-bold">Giá</th>
-                  <th className="text-center fw-bold">Actions</th>
+                  <th className="fw-bold text-center">Ảnh</th>
+                  <th className="fw-bold text-center">Tên</th>
+                  <th className="fw-bold text-center">Hãng</th>
+                  <th className="fw-bold text-center">CPU</th>
+                  <th className="fw-bold text-center">Số lượng</th>
+                  <th className="fw-bold text-center">Hệ điều hành</th>
+                  <th className="fw-bold text-center">Giá</th>
+                  <th className="fw-bold text-center">Hành động</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredProducts.map((product) => (
-                  <tr key={product.id} className="hover-effect">
+                  <tr key={product.id}>
                     <td className="text-center align-middle">
                       {product.image ? (
                         <img
@@ -199,13 +211,13 @@ const ListProducts = () => {
                     <td className="text-center align-middle">
                       <div className="d-flex gap-2 justify-content-center">
                         <button
-                          className="btn btn-warning btn-sm d-flex align-items-center gap-1"
+                          className="btn btn-warning btn-sm d-flex align-items-center gap-1 shadow-sm"
                           onClick={() => handleEdit(product.id)}
                         >
                           <FaEdit />
                         </button>
                         <button
-                          className="btn btn-danger btn-sm d-flex align-items-center gap-1"
+                          className="btn btn-danger btn-sm d-flex align-items-center gap-1 shadow-sm"
                           onClick={() => handleShowDeleteModal(product.id)}
                         >
                           <FaTrash />
@@ -220,11 +232,14 @@ const ListProducts = () => {
         </div>
       </div>
 
-      <Modal show={showDeleteModal} onHide={handleCloseDeleteModal}>
+      <Modal show={showDeleteModal} onHide={handleCloseDeleteModal} centered>
         <Modal.Header closeButton>
           <Modal.Title>Xác nhận xóa</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Bạn có chắc chắn muốn xóa sản phẩm này không?</Modal.Body>
+        <Modal.Body>
+          Bạn có chắc chắn muốn xóa sản phẩm này không? Hành động này không thể
+          hoàn tác.
+        </Modal.Body>
         <Modal.Footer>
           <Button
             variant="danger"

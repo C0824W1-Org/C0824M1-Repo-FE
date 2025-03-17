@@ -9,7 +9,7 @@
 
 .products {
   font-family: "Roboto", sans-serif;
-  margin-bottom: 120px;
+  margin-bottom: 80px;
 }
 
 .card-img-container {
@@ -54,4 +54,8 @@
 .products-card:hover {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Bóng đổ nhẹ */
   transition: box-shadow 0.3s ease-in-out; /* Hiệu ứng mượt mà */
+}
+
+.pagination {
+  margin-bottom: 130px;
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Card } from "react-bootstrap";
+import { Container, Row, Col, Card, Pagination } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import banner1 from "../../assets/img/banner-1.jpg";
 import banner2 from "../../assets/img/banner-2.png";
@@ -14,6 +14,8 @@ function Body() {
   const [currentImage, setCurrentImage] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(15);
 
   const images = [banner1, banner2, banner3, banner4];
 
@@ -64,9 +66,18 @@ function Body() {
     setIsVisible(false);
   };
 
-  if (loading) {
-    return <div>Đang tải dữ liệu...</div>;
+  // Tính toán sản phẩm hiện tại
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = phones.slice(indexOfFirstItem, indexOfLastItem);
+
+  // Tính toán số lượng trang
+  const pageNumbers = [];
+  for (let i = 1; i <= Math.ceil(phones.length / itemsPerPage); i++) {
+    pageNumbers.push(i);
   }
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <>
@@ -138,7 +149,7 @@ function Body() {
         </div>
 
         <Row className="g-4 products">
-          {phones.map((phone) => (
+          {currentItems.map((phone) => (
             <Col
               key={phone.id}
               xs={12}
@@ -174,6 +185,19 @@ function Body() {
             </Col>
           ))}
         </Row>
+
+        {/* Phân trang */}
+        <Pagination className="pagination justify-content-center mt-4">
+          {pageNumbers.map((number) => (
+            <Pagination.Item
+              key={number}
+              active={number === currentPage}
+              onClick={() => paginate(number)}
+            >
+              {number}
+            </Pagination.Item>
+          ))}
+        </Pagination>
       </Container>
     </>
   );

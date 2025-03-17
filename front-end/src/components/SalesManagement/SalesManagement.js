@@ -211,13 +211,12 @@ const SalesManagement = () => {
       <h2 className="mb-4">Quản lý bán hàng</h2>
       <div className="card shadow-sm">
         <div className="card-body">
-          <h5 className="card-title">Thông tin bán hàng</h5>
           <div className="mb-3">
-            <h6>Thông tin khách hàng</h6>
+            <h6 className="mb-3">Thông tin khách hàng</h6>
             <Button
               variant="primary"
               onClick={() => setShowCustomerModal(true)}
-              className="mb-2"
+              className="mb-4"
             >
               Chọn khách hàng cũ
             </Button>
