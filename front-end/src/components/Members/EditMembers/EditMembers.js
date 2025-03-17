@@ -1,17 +1,32 @@
 import React, { useState, useEffect } from "react";
 import UsersService from "../../../services/Users.service";
 import { toast } from "react-toastify";
+import { useNavigate, useParams } from "react-router-dom";
 
-const EditMembers = ({ onPageChange, memberId }) => {
-  const [formData, setFormData] = useState(null);
+const EditMembers = () => {
+  const navigate = useNavigate();
+  const { memberId } = useParams(); // Lấy memberId từ URL
+  const [formData, setFormData] = useState({
+    username: "",
+    password: "",
+    role: "",
+    personalInfo: {
+      fullName: "",
+      dateOfBirth: "",
+      address: "",
+      phone: "",
+      job: "",
+    },
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Lấy thông tin nhân viên khi component mount
   useEffect(() => {
     const fetchMember = async () => {
       try {
         const response = await UsersService.getAllUsers();
-        const member = response.find((user) => user.id === memberId);
+        const member = response.find((user) => user.id === parseInt(memberId));
         if (member) {
           setFormData({
             username: member.username,
@@ -19,6 +34,8 @@ const EditMembers = ({ onPageChange, memberId }) => {
             role: member.role,
             personalInfo: { ...member.personalInfo },
           });
+        } else {
+          setError("Không tìm thấy nhân viên với ID này");
         }
         setLoading(false);
       } catch (err) {
@@ -30,6 +47,7 @@ const EditMembers = ({ onPageChange, memberId }) => {
     fetchMember();
   }, [memberId]);
 
+  // Xử lý thay đổi input
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name in formData.personalInfo) {
@@ -48,55 +66,61 @@ const EditMembers = ({ onPageChange, memberId }) => {
     }
   };
 
+  // Xử lý submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // Kiểm tra các trường bắt buộc
+    if (!formData.username || !formData.password) {
+      toast.error("Vui lòng nhập tên đăng nhập và mật khẩu.");
+      return;
+    }
+    if (
+      !formData.personalInfo.fullName ||
+      !formData.personalInfo.dateOfBirth ||
+      !formData.personalInfo.address ||
+      !formData.personalInfo.phone
+    ) {
+      toast.error("Vui lòng nhập đầy đủ thông tin cá nhân.");
+      return;
+    }
+
     try {
       await UsersService.updateUser(memberId, formData);
       toast.success("Cập nhật thông tin nhân viên thành công!");
-      onPageChange("ListMembers");
+      navigate("/admin/list-members");
     } catch (err) {
-      toast.error("Có lỗi xảy ra khi cập nhật thông tin nhân viên.");
+      console.error("Lỗi khi cập nhật nhân viên:", err.response || err.message);
+      toast.error(
+        err.response?.data?.message ||
+          err.message ||
+          "Có lỗi xảy ra khi cập nhật thông tin nhân viên."
+      );
     }
   };
 
+  // Xử lý hủy bỏ
   const handleCancel = () => {
-    onPageChange("ListMembers");
+    navigate("/admin/list-members");
   };
 
+  // Hiển thị loading
   if (loading) {
-    return <div>Đang tải thông tin nhân viên...</div>;
+    return (
+      <div className="text-center py-5">Đang tải thông tin nhân viên...</div>
+    );
   }
 
-  if (error || !formData) {
-    return <div>{error || "Không tìm thấy thông tin nhân viên"}</div>;
+  // Hiển thị lỗi nếu có
+  if (error) {
+    return <div className="alert alert-danger text-center">{error}</div>;
   }
 
   return (
-    <div className="content container-fluid">
-      <h2>Sửa thông tin nhân viên</h2>
-      <div className="card">
+    <div className="content container-fluid p-4">
+      <h2 className="mb-4">Chỉnh sửa nhân viên</h2>
+      <div className="card shadow-sm">
         <div className="card-body">
           <form onSubmit={handleSubmit}>
-            <div className="form-group mb-3">
-              <label>Tên đăng nhập</label>
-              <input
-                type="text"
-                className="form-control"
-                name="username"
-                value={formData.username}
-                disabled
-              />
-            </div>
-            <div className="form-group mb-3">
-              <label>Mật khẩu</label>
-              <input
-                type="password"
-                className="form-control"
-                name="password"
-                value={formData.password}
-                disabled
-              />
-            </div>
             <div className="form-group mb-3">
               <label>Vai trò</label>
               <select
@@ -113,7 +137,9 @@ const EditMembers = ({ onPageChange, memberId }) => {
               </select>
             </div>
             <div className="form-group mb-3">
-              <label>Họ và tên</label>
+              <label>
+                Họ và tên <span className="text-danger">*</span>
+              </label>
               <input
                 type="text"
                 className="form-control"
@@ -124,7 +150,9 @@ const EditMembers = ({ onPageChange, memberId }) => {
               />
             </div>
             <div className="form-group mb-3">
-              <label>Ngày sinh</label>
+              <label>
+                Ngày sinh <span className="text-danger">*</span>
+              </label>
               <input
                 type="date"
                 className="form-control"
@@ -135,7 +163,9 @@ const EditMembers = ({ onPageChange, memberId }) => {
               />
             </div>
             <div className="form-group mb-3">
-              <label>Địa chỉ</label>
+              <label>
+                Địa chỉ <span className="text-danger">*</span>
+              </label>
               <input
                 type="text"
                 className="form-control"
@@ -146,7 +176,9 @@ const EditMembers = ({ onPageChange, memberId }) => {
               />
             </div>
             <div className="form-group mb-3">
-              <label>Số điện thoại</label>
+              <label>
+                Số điện thoại <span className="text-danger">*</span>
+              </label>
               <input
                 type="text"
                 className="form-control"

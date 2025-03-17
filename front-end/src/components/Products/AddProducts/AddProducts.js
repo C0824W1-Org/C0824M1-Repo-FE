@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import ProductsService from "../../../services/Products.service";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
-const AddProducts = ({ onPageChange }) => {
+const AddProducts = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     brand: "Apple", // Giá trị mặc định
@@ -16,9 +18,10 @@ const AddProducts = ({ onPageChange }) => {
     color: "",
     quantity: "",
     description: "",
-    image: "",
+    image: "", // Trường image sẽ lưu chuỗi Base64
   });
 
+  // Xử lý thay đổi input
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -27,33 +30,66 @@ const AddProducts = ({ onPageChange }) => {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await ProductsService.addProduct({
-        ...formData,
-        price: parseInt(formData.price), // Chuyển thành số
-        quantity: parseInt(formData.quantity), // Chuyển thành số
-      });
-      toast.success("Thêm hàng hóa thành công!");
-      onPageChange("ListProducts");
-    } catch (err) {
-      toast.error("Có lỗi xảy ra khi thêm hàng hóa.");
+  // Xử lý khi người dùng chọn file ảnh
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData((prev) => ({
+          ...prev,
+          image: reader.result, // Lưu chuỗi Base64 vào image
+        }));
+      };
+      reader.readAsDataURL(file); // Chuyển ảnh thành Base64
     }
   };
 
+  // Xử lý submit form
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    // Kiểm tra các trường bắt buộc
+    if (!formData.name || !formData.price || !formData.quantity) {
+      toast.error(
+        "Vui lòng nhập đầy đủ các trường bắt buộc: Tên, Giá, Số lượng."
+      );
+      return;
+    }
+
+    try {
+      const productData = {
+        ...formData,
+        price: parseInt(formData.price), // Chuyển thành số
+        quantity: parseInt(formData.quantity), // Chuyển thành số
+      };
+      await ProductsService.addProduct(productData);
+      toast.success("Thêm hàng hóa thành công!");
+      navigate("/admin/list-products");
+    } catch (err) {
+      console.error("Lỗi khi thêm hàng hóa:", err.response || err.message);
+      toast.error(
+        err.response?.data?.message ||
+          err.message ||
+          "Có lỗi xảy ra khi thêm hàng hóa."
+      );
+    }
+  };
+
+  // Xử lý hủy bỏ
   const handleCancel = () => {
-    onPageChange("ListProducts");
+    navigate("/admin/list-products");
   };
 
   return (
-    <div className="content container-fluid">
-      <h2>Thêm hàng hóa</h2>
-      <div className="card">
+    <div className="content container-fluid p-4">
+      <h2 className="mb-4">Thêm hàng hóa</h2>
+      <div className="card shadow-sm">
         <div className="card-body">
           <form onSubmit={handleSubmit}>
             <div className="form-group mb-3">
-              <label>Tên</label>
+              <label>
+                Tên <span className="text-danger">*</span>
+              </label>
               <input
                 type="text"
                 className="form-control"
@@ -74,10 +110,16 @@ const AddProducts = ({ onPageChange }) => {
               >
                 <option value="Apple">Apple</option>
                 <option value="Samsung">Samsung</option>
+                <option value="Oppo">Oppo</option>
+                <option value="Nokia">Nokia</option>
+                <option value="Pixel">Pixel</option>
+                <option value="Vivo">Vivo</option>
               </select>
             </div>
             <div className="form-group mb-3">
-              <label>Giá (VNĐ)</label>
+              <label>
+                Giá (VNĐ) <span className="text-danger">*</span>
+              </label>
               <input
                 type="number"
                 className="form-control"
@@ -95,7 +137,6 @@ const AddProducts = ({ onPageChange }) => {
                 name="cpu"
                 value={formData.cpu}
                 onChange={handleChange}
-                required
               />
             </div>
             <div className="form-group mb-3">
@@ -106,7 +147,6 @@ const AddProducts = ({ onPageChange }) => {
                 name="storage"
                 value={formData.storage}
                 onChange={handleChange}
-                required
               />
             </div>
             <div className="form-group mb-3">
@@ -117,7 +157,6 @@ const AddProducts = ({ onPageChange }) => {
                 name="os"
                 value={formData.os}
                 onChange={handleChange}
-                required
               />
             </div>
             <div className="form-group mb-3">
@@ -161,7 +200,9 @@ const AddProducts = ({ onPageChange }) => {
               />
             </div>
             <div className="form-group mb-3">
-              <label>Số lượng</label>
+              <label>
+                Số lượng <span className="text-danger">*</span>
+              </label>
               <input
                 type="number"
                 className="form-control"
@@ -181,14 +222,22 @@ const AddProducts = ({ onPageChange }) => {
               />
             </div>
             <div className="form-group mb-3">
-              <label>Link ảnh</label>
+              <label>Ảnh sản phẩm</label>
               <input
-                type="text"
+                type="file"
                 className="form-control"
-                name="image"
-                value={formData.image}
-                onChange={handleChange}
+                accept="image/*"
+                onChange={handleImageChange}
               />
+              {formData.image && (
+                <div className="mt-2">
+                  <img
+                    src={formData.image}
+                    alt="Preview"
+                    style={{ maxWidth: "200px", maxHeight: "200px" }}
+                  />
+                </div>
+              )}
             </div>
             <div className="d-flex gap-2">
               <button type="submit" className="btn btn-primary">

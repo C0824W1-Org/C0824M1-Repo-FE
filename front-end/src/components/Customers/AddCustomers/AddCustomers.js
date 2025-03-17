@@ -1,15 +1,15 @@
 import React, { useState } from "react";
-import SuppliersService from "../../../services/Suppliers.service";
-import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import CustomersService from "../../../services/Customers.service";
+import { toast } from "react-toastify";
 
-const AddSuppliers = () => {
+const AddCustomers = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    supplierCode: "",
-    name: "",
-    address: "",
+    fullName: "",
     phone: "",
+    address: "",
+    age: "",
     email: "",
   });
 
@@ -23,79 +23,42 @@ const AddSuppliers = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (
-      !formData.supplierCode ||
-      !formData.name ||
-      !formData.address ||
-      !formData.phone ||
-      !formData.email
-    ) {
-      toast.error("Vui lòng nhập đầy đủ thông tin nhà cung cấp.");
-      return;
-    }
-
     try {
-      await SuppliersService.addSupplier(formData);
-      toast.success("Thêm nhà cung cấp thành công!");
-      navigate("/admin/list-suppliers");
+      await CustomersService.addCustomer({
+        ...formData,
+        age: formData.age ? parseInt(formData.age) : "",
+      });
+      toast.success("Thêm khách hàng thành công!");
+      navigate("/admin/list-customers"); // Sửa thành đường dẫn đầy đủ
     } catch (err) {
-      toast.error("Có lỗi xảy ra khi thêm nhà cung cấp.");
+      toast.error(`Có lỗi khi thêm khách hàng: ${err.message}`);
+      console.error("Lỗi thêm khách hàng:", err);
     }
   };
 
   const handleCancel = () => {
-    navigate("/admin/list-suppliers");
+    navigate("/admin/list-customers"); // Sửa thành đường dẫn đầy đủ
   };
 
   return (
     <div className="content container-fluid">
-      <h2 className="mb-4">Thêm nhà cung cấp</h2>
+      <h2>Thêm khách hàng</h2>
       <div className="card">
         <div className="card-body">
           <form onSubmit={handleSubmit}>
             <div className="form-group mb-3">
-              <label>
-                Mã nhà cung cấp <span className="text-danger">*</span>
-              </label>
+              <label>Họ và tên</label>
               <input
                 type="text"
                 className="form-control"
-                name="supplierCode"
-                value={formData.supplierCode}
+                name="fullName"
+                value={formData.fullName}
                 onChange={handleChange}
                 required
               />
             </div>
             <div className="form-group mb-3">
-              <label>
-                Tên <span className="text-danger">*</span>
-              </label>
-              <input
-                type="text"
-                className="form-control"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="form-group mb-3">
-              <label>
-                Địa chỉ <span className="text-danger">*</span>
-              </label>
-              <input
-                type="text"
-                className="form-control"
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="form-group mb-3">
-              <label>
-                Số điện thoại <span className="text-danger">*</span>
-              </label>
+              <label>Số điện thoại</label>
               <input
                 type="text"
                 className="form-control"
@@ -106,21 +69,40 @@ const AddSuppliers = () => {
               />
             </div>
             <div className="form-group mb-3">
-              <label>
-                Email <span className="text-danger">*</span>
-              </label>
+              <label>Địa chỉ</label>
+              <input
+                type="text"
+                className="form-control"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="form-group mb-3">
+              <label>Tuổi</label>
+              <input
+                type="number"
+                className="form-control"
+                name="age"
+                value={formData.age}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="form-group mb-3">
+              <label>Email (không bắt buộc)</label>
               <input
                 type="email"
                 className="form-control"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                required
               />
             </div>
             <div className="d-flex gap-2">
               <button type="submit" className="btn btn-primary">
-                Thêm nhà cung cấp
+                Thêm khách hàng
               </button>
               <button
                 type="button"
@@ -137,4 +119,4 @@ const AddSuppliers = () => {
   );
 };
 
-export default AddSuppliers;
+export default AddCustomers;

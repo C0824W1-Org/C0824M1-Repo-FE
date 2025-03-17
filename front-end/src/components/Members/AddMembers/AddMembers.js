@@ -1,21 +1,24 @@
 import React, { useState } from "react";
 import UsersService from "../../../services/Users.service";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
-const AddMembers = ({ onPageChange }) => {
+const AddMembers = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    username: "newuser", // Giá trị mặc định, không sửa được
-    password: "default123", // Giá trị mặc định, không sửa được
+    username: "",
+    password: "",
     role: "admin",
     personalInfo: {
       fullName: "",
       dateOfBirth: "",
       address: "",
       phone: "",
-      job: "Quản trị", // Giá trị mặc định cho select
+      job: "Quản trị",
     },
   });
 
+  // Xử lý thay đổi input
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name in formData.personalInfo) {
@@ -34,45 +37,78 @@ const AddMembers = ({ onPageChange }) => {
     }
   };
 
+  // Xử lý submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // Kiểm tra các trường bắt buộc
+    if (!formData.username || !formData.password) {
+      toast.error("Vui lòng nhập tên đăng nhập và mật khẩu.");
+      return;
+    }
+    if (
+      !formData.personalInfo.fullName ||
+      !formData.personalInfo.dateOfBirth ||
+      !formData.personalInfo.address ||
+      !formData.personalInfo.phone
+    ) {
+      toast.error("Vui lòng nhập đầy đủ thông tin cá nhân.");
+      return;
+    }
+
     try {
       await UsersService.addUser(formData);
       toast.success("Thêm nhân viên thành công!");
-      onPageChange("ListMembers");
+      navigate("/admin/list-members");
     } catch (err) {
-      toast.error("Có lỗi xảy ra khi thêm nhân viên.");
+      console.error("Lỗi khi thêm nhân viên:", err.response || err.message);
+      toast.error(
+        err.response?.data?.message ||
+          err.message ||
+          "Có lỗi xảy ra khi thêm nhân viên."
+      );
     }
   };
 
+  // Xử lý hủy bỏ
   const handleCancel = () => {
-    onPageChange("ListMembers");
+    try {
+      navigate("/admin/list-members");
+    } catch (err) {
+      console.error("Lỗi khi hủy bỏ:", err);
+      toast.error("Có lỗi xảy ra khi quay lại danh sách nhân viên.");
+    }
   };
 
   return (
-    <div className="content container-fluid">
-      <h2>Thêm nhân viên</h2>
-      <div className="card">
+    <div className="content container-fluid p-4">
+      <h2 className="mb-4">Thêm nhân viên</h2>
+      <div className="card shadow-sm">
         <div className="card-body">
           <form onSubmit={handleSubmit}>
             <div className="form-group mb-3">
-              <label>Tên đăng nhập</label>
+              <label>
+                Tên đăng nhập <span className="text-danger">*</span>
+              </label>
               <input
                 type="text"
                 className="form-control"
                 name="username"
-                value={formData.username}
-                disabled
+                value={formData.username || ""}
+                onChange={handleChange}
+                required
               />
             </div>
             <div className="form-group mb-3">
-              <label>Mật khẩu</label>
+              <label>
+                Mật khẩu <span className="text-danger">*</span>
+              </label>
               <input
-                type="password"
+                type="text"
                 className="form-control"
                 name="password"
-                value={formData.password}
-                disabled
+                value={formData.password || ""}
+                onChange={handleChange}
+                required
               />
             </div>
             <div className="form-group mb-3">
@@ -91,7 +127,9 @@ const AddMembers = ({ onPageChange }) => {
               </select>
             </div>
             <div className="form-group mb-3">
-              <label>Họ và tên</label>
+              <label>
+                Họ và tên <span className="text-danger">*</span>
+              </label>
               <input
                 type="text"
                 className="form-control"
@@ -102,7 +140,9 @@ const AddMembers = ({ onPageChange }) => {
               />
             </div>
             <div className="form-group mb-3">
-              <label>Ngày sinh</label>
+              <label>
+                Ngày sinh <span className="text-danger">*</span>
+              </label>
               <input
                 type="date"
                 className="form-control"
@@ -113,7 +153,9 @@ const AddMembers = ({ onPageChange }) => {
               />
             </div>
             <div className="form-group mb-3">
-              <label>Địa chỉ</label>
+              <label>
+                Địa chỉ <span className="text-danger">*</span>
+              </label>
               <input
                 type="text"
                 className="form-control"
@@ -124,7 +166,9 @@ const AddMembers = ({ onPageChange }) => {
               />
             </div>
             <div className="form-group mb-3">
-              <label>Số điện thoại</label>
+              <label>
+                Số điện thoại <span className="text-danger">*</span>
+              </label>
               <input
                 type="text"
                 className="form-control"

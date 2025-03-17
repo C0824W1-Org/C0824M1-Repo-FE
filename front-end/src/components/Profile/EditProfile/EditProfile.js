@@ -3,9 +3,10 @@ import { useSelector, useDispatch } from "react-redux";
 import UsersService from "../../../services/Users.service";
 import { login } from "../../../redux/features/authSlice";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
-const EditProfile = ({ onPageChange }) => {
-  // Thêm props onPageChange
+const EditProfile = () => {
+  const navigate = useNavigate();
   const { userLogin } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
@@ -28,7 +29,11 @@ const EditProfile = ({ onPageChange }) => {
 
   // Kiểm tra nếu không có thông tin người dùng
   if (!userLogin || Object.keys(userLogin).length === 0) {
-    return <div>Không có thông tin người dùng. Vui lòng đăng nhập lại.</div>;
+    return (
+      <div className="text-center py-5">
+        Không có thông tin người dùng. Vui lòng đăng nhập lại.
+      </div>
+    );
   }
 
   // Xử lý thay đổi giá trị input
@@ -60,7 +65,7 @@ const EditProfile = ({ onPageChange }) => {
       localStorage.setItem("user", JSON.stringify(updatedUser));
 
       toast.success("Cập nhật thông tin thành công!");
-      onPageChange("ViewsProfile"); // Chuyển về trang ViewsProfile bằng onPageChange
+      navigate("/admin/views-profile");
     } catch (error) {
       console.error("Lỗi khi cập nhật thông tin:", error);
       toast.error("Có lỗi xảy ra khi cập nhật thông tin.");
@@ -69,12 +74,12 @@ const EditProfile = ({ onPageChange }) => {
 
   // Xử lý khi hủy chỉnh sửa
   const handleCancel = () => {
-    onPageChange("ViewsProfile"); // Chuyển về trang ViewsProfile khi hủy
+    navigate("/admin/views-profile");
   };
 
   return (
-    <div className="content container-fluid">
-      <div className="card">
+    <div className="content container-fluid p-4">
+      <div className="card shadow-sm">
         <div className="card-body">
           <h5 className="card-title">Cập nhật thông tin</h5>
           <form onSubmit={handleSubmit}>
@@ -147,8 +152,8 @@ const EditProfile = ({ onPageChange }) => {
                 </tr>
               </tbody>
             </table>
-            <div className="mt-3">
-              <button type="submit" className="btn btn-primary me-2">
+            <div className="mt-3 d-flex gap-2">
+              <button type="submit" className="btn btn-primary">
                 Lưu thay đổi
               </button>
               <button

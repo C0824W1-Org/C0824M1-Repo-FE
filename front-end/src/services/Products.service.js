@@ -22,6 +22,25 @@ class ProductsService {
       throw error;
     }
   }
+
+  static async updateProductQuantity(productId, newQuantity) {
+    try {
+      const product = await this.getAllProducts();
+      const targetProduct = product.find((p) => p.id === productId);
+      if (targetProduct) {
+        return await instance.put(`/phones/${productId}`, {
+          ...targetProduct,
+          quantity: newQuantity,
+        });
+      }
+    } catch (error) {
+      console.error(
+        "Lỗi khi cập nhật số lượng:",
+        error.response || error.message
+      );
+      throw error;
+    }
+  }
 }
 
 export default ProductsService;
