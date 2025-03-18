@@ -161,6 +161,12 @@
   font-size: 12px;
 }
 
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
 /* Responsive Styles */
 @media (max-width: 768px) {
   .sidebar.open {

@@ -22,6 +22,8 @@ import ListCustomers from "../../../components/Customers/ListCustomers/ListCusto
 import AddCustomers from "../../../components/Customers/AddCustomers/AddCustomers";
 import EditCustomers from "../../../components/Customers/EditCustomers/EditCustomers";
 import "../../assets/css/MasterAdmin.css";
+import Account from "../../../components/Settings/Account/Account";
+import EditAccount from "../../../components/Settings/Account/EditAccount";
 
 const MasterAdmin = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -62,6 +64,8 @@ const MasterAdmin = () => {
             path="edit-customers/:customerId"
             element={<EditCustomers />}
           />
+          <Route path="settings" element={<Account />} />{" "}
+          <Route path="edit-account" element={<EditAccount />} />{" "}
         </Routes>
       </div>
     </div>

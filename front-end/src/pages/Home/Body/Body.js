@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Card, Pagination } from "react-bootstrap";
+import { Container, Row, Col, Card, Button } from "react-bootstrap"; // Thay Pagination bằng Button
 import "bootstrap/dist/css/bootstrap.min.css";
 import banner1 from "../../assets/img/banner-1.jpg";
 import banner2 from "../../assets/img/banner-2.png";
@@ -14,8 +14,8 @@ function Body() {
   const [currentImage, setCurrentImage] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(15);
+  const [visibleItems, setVisibleItems] = useState(15); // Số sản phẩm hiển thị ban đầu
+  const itemsPerLoad = 15; // Số sản phẩm tải thêm mỗi lần
 
   const images = [banner1, banner2, banner3, banner4];
 
@@ -27,7 +27,7 @@ function Body() {
       } catch (error) {
         console.error("Lỗi khi lấy dữ liệu điện thoại:", error);
       } finally {
-        setLoading(false); // Kết thúc loading
+        setLoading(false);
       }
     };
     fetchPhones();
@@ -47,6 +47,7 @@ function Body() {
         break;
     }
     setPhones(sortedPhones);
+    setVisibleItems(itemsPerLoad); // Reset về số lượng ban đầu khi sắp xếp
   };
 
   const handleSortChange = (criteria) => {
@@ -66,18 +67,20 @@ function Body() {
     setIsVisible(false);
   };
 
-  // Tính toán sản phẩm hiện tại
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = phones.slice(indexOfFirstItem, indexOfLastItem);
+  // Xử lý khi nhấn "Xem thêm"
+  const handleLoadMore = () => {
+    setVisibleItems((prev) => prev + itemsPerLoad);
+  };
 
-  // Tính toán số lượng trang
-  const pageNumbers = [];
-  for (let i = 1; i <= Math.ceil(phones.length / itemsPerPage); i++) {
-    pageNumbers.push(i);
+  // Lấy danh sách sản phẩm hiển thị
+  const currentItems = phones.slice(0, visibleItems);
+
+  // Kiểm tra xem còn sản phẩm để hiển thị không
+  const hasMoreItems = visibleItems < phones.length;
+
+  if (loading) {
+    return <div>Đang tải dữ liệu...</div>;
   }
-
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <>
@@ -186,18 +189,18 @@ function Body() {
           ))}
         </Row>
 
-        {/* Phân trang */}
-        <Pagination className="pagination justify-content-center mt-4">
-          {pageNumbers.map((number) => (
-            <Pagination.Item
-              key={number}
-              active={number === currentPage}
-              onClick={() => paginate(number)}
+        {/* Nút "Xem thêm" */}
+        {hasMoreItems && (
+          <div className="d-flex justify-content-center mt-4 mb-5">
+            <Button
+              className="btn-add"
+              variant="light"
+              onClick={handleLoadMore}
             >
-              {number}
-            </Pagination.Item>
-          ))}
-        </Pagination>
+              Xem thêm sản phẩm
+            </Button>
+          </div>
+        )}
       </Container>
     </>
   );

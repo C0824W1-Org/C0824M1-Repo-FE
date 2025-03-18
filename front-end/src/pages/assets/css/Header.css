@@ -20,24 +20,41 @@
   min-width: 24px;
   min-height: 24px;
   flex-shrink: 0;
-  margin-right: 8px; /* Thêm khoảng cách với text */
+  margin-right: 8px;
+}
+
+/* Styling cho kết quả tìm kiếm */
+.search-results {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.search-results li {
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.search-results li:hover {
+  background-color: #f8f9fa;
 }
 
 /* Responsive adjustments */
 @media (max-width: 991px) {
-  /* Sử dụng breakpoint của Bootstrap (lg) */
   .nav {
-    height: auto; /* Cho phép height tự điều chỉnh trên mobile */
+    height: auto;
     padding: 0.5rem 0;
   }
 
   .navbar-collapse {
-    background: #be1e2d; /* Giữ màu nền nhất quán */
+    background: #be1e2d;
     padding: 1rem;
     border-radius: 0 0 8px 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    max-height: calc(100vh - 64px); /* Giới hạn chiều cao */
-    overflow-y: auto; /* Cho phép scroll nếu nội dung dài */
+    max-height: calc(100vh - 64px);
+    overflow-y: auto;
   }
 
   .nav .nav-link {
@@ -50,11 +67,11 @@
   }
 
   .nav .nav-link:hover {
-    background-color: rgba(255, 255, 255, 0.1); /* Hiệu ứng hover */
+    background-color: rgba(255, 255, 255, 0.1);
   }
 
   .color-white {
-    font-size: 14px; /* Tăng kích thước chữ trên mobile cho dễ đọc */
+    font-size: 14px;
     padding: 0 5px;
   }
 
@@ -66,7 +83,15 @@
 
   .navbar .form-control {
     width: 100% !important;
+    maxwidth: 100% !important; /* Đảm bảo ô tìm kiếm chiếm toàn bộ chiều rộng trên mobile */
     margin: 0 !important;
+  }
+
+  .search-results {
+    width: calc(
+      100% - 2rem
+    ); /* Đảm bảo kết quả tìm kiếm khớp với ô nhập trên mobile */
+    margin-left: 1rem;
   }
 }
 
@@ -82,5 +107,14 @@
 
   .nav .nav-link:hover {
     background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .navbar form {
+    flex-grow: 1; /* Cho phép form mở rộng trên desktop */
+    max-width: 500px; /* Giới hạn chiều rộng tối đa */
+  }
+
+  .search-results {
+    width: 500px; /* Khớp với chiều rộng ô tìm kiếm trên desktop */
   }
 }

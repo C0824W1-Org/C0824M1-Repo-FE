@@ -72,14 +72,14 @@ const Sidebar = ({ isSidebarOpen, userRole }) => {
       path: "/admin/revenue-management",
       icon: FaMoneyBillWave,
       label: "Quản lý doanh thu",
-      roles: ["admin"],
+      roles: ["admin", "business"],
     },
     {
       name: "settings",
       path: "/admin/settings",
       icon: FaCog,
       label: "Settings",
-      roles: ["admin"],
+      roles: ["admin", "stockkeeper", "sales", "business"],
     },
   ];
 

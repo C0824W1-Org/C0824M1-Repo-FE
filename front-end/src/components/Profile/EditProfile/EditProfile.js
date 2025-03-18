@@ -10,7 +10,6 @@ const EditProfile = () => {
   const { userLogin } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
-  // Khởi tạo state cho các trường có thể chỉnh sửa
   const [formData, setFormData] = useState(
     userLogin && Object.keys(userLogin).length > 0
       ? {
@@ -18,16 +17,17 @@ const EditProfile = () => {
           dateOfBirth: userLogin.personalInfo.dateOfBirth,
           address: userLogin.personalInfo.address,
           phone: userLogin.personalInfo.phone,
+          avatar: userLogin.personalInfo.avatar || "",
         }
       : {
           fullName: "",
           dateOfBirth: "",
           address: "",
           phone: "",
+          avatar: "",
         }
   );
 
-  // Kiểm tra nếu không có thông tin người dùng
   if (!userLogin || Object.keys(userLogin).length === 0) {
     return (
       <div className="text-center py-5">
@@ -36,7 +36,6 @@ const EditProfile = () => {
     );
   }
 
-  // Xử lý thay đổi giá trị input
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -45,7 +44,20 @@ const EditProfile = () => {
     }));
   };
 
-  // Xử lý khi submit form
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData((prev) => ({
+          ...prev,
+          avatar: reader.result,
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -57,11 +69,15 @@ const EditProfile = () => {
           dateOfBirth: formData.dateOfBirth,
           address: formData.address,
           phone: formData.phone,
+          avatar: formData.avatar,
         },
       };
 
+      // Cập nhật dữ liệu lên server
       await UsersService.updateUser(userLogin.id, updatedUser);
+      // Cập nhật Redux store
       dispatch(login(updatedUser));
+      // Cập nhật localStorage
       localStorage.setItem("user", JSON.stringify(updatedUser));
 
       toast.success("Cập nhật thông tin thành công!");
@@ -72,7 +88,6 @@ const EditProfile = () => {
     }
   };
 
-  // Xử lý khi hủy chỉnh sửa
   const handleCancel = () => {
     navigate("/admin/views-profile");
   };
@@ -148,6 +163,24 @@ const EditProfile = () => {
                       value={userLogin.personalInfo.job}
                       disabled
                     />
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">Ảnh đại diện</th>
+                  <td>
+                    <input
+                      type="file"
+                      className="form-control"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                    />
+                    {formData.avatar && (
+                      <img
+                        src={formData.avatar}
+                        alt="Avatar Preview"
+                        style={{ maxWidth: "100px", marginTop: "10px" }}
+                      />
+                    )}
                   </td>
                 </tr>
               </tbody>

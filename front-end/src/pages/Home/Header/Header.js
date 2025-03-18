@@ -1,11 +1,37 @@
 import React, { useState } from "react";
 import { Container, Navbar, Nav, Form, FormControl } from "react-bootstrap";
-import { Link } from "react-router"; // Import Link
+import { Link } from "react-router-dom"; // Sửa lỗi cú pháp: react-router-dom
 import logo from "../../assets/img/logo.svg";
 import "../../assets/css/Header.css";
+import PhonesService from "../../../services/Phones.service.js"; // Import PhonesService
 
 function Header() {
   const [expanded, setExpanded] = useState(false);
+  const [searchTerm, setSearchTerm] = useState(""); // State cho từ khóa tìm kiếm
+  const [searchResults, setSearchResults] = useState([]); // State cho kết quả tìm kiếm
+
+  // Xử lý tìm kiếm sản phẩm
+  const handleSearch = async (e) => {
+    const term = e.target.value;
+    setSearchTerm(term);
+
+    if (term.trim() === "") {
+      setSearchResults([]); // Xóa kết quả nếu ô tìm kiếm rỗng
+      return;
+    }
+
+    try {
+      const response = await PhonesService.getAllPhones();
+      const phones = Array.isArray(response) ? response : [];
+      const filteredPhones = phones.filter((phone) =>
+        phone.name.toLowerCase().includes(term.toLowerCase())
+      );
+      setSearchResults(filteredPhones.slice(0, 5)); // Giới hạn 5 kết quả gợi ý
+    } catch (error) {
+      console.error("Lỗi khi tìm kiếm sản phẩm:", error);
+      setSearchResults([]);
+    }
+  };
 
   return (
     <Navbar
@@ -23,18 +49,43 @@ function Header() {
         <Navbar.Toggle aria-controls="navbar-nav" />
 
         <Navbar.Collapse id="navbar-nav">
-          <Form className="d-flex mx-3 my-2 my-lg-0">
+          <Form className="d-flex mx-3 my-2 my-lg-0 position-relative">
             <FormControl
               type="search"
               placeholder="Bạn cần tìm gì?"
               className="me-2"
               aria-label="Search"
+              value={searchTerm}
+              onChange={handleSearch}
               style={{
                 borderRadius: "20px",
                 width: "100%",
-                maxWidth: "365px",
+                maxWidth: "500px", // Tăng chiều rộng tối đa trên desktop
               }}
             />
+            {/* Hiển thị gợi ý tìm kiếm */}
+            {searchResults.length > 0 && (
+              <ul
+                className="search-results position-absolute bg-white shadow-sm border rounded mt-5 w-100"
+                style={{ zIndex: 1000 }}
+              >
+                {searchResults.map((phone) => (
+                  <li key={phone.id} className="p-2">
+                    <a
+                      href={`#/phones/${phone.id}`}
+                      className="text-dark text-decoration-none"
+                      onClick={() => {
+                        setSearchTerm("");
+                        setSearchResults([]);
+                        setExpanded(false);
+                      }}
+                    >
+                      {phone.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
           </Form>
 
           <Nav className="ms-auto flex-column flex-lg-row">

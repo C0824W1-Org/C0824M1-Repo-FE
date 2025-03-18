@@ -27,6 +27,30 @@ const ViewsProfile = () => {
       <div className="card shadow-sm">
         <div className="card-body">
           <h5 className="card-title fw-bold mb-4">Thông tin người dùng</h5>
+          <div className="text-center mb-4">
+            {personalInfo.avatar ? (
+              <img
+                src={personalInfo.avatar}
+                alt="User Avatar"
+                style={{ maxWidth: "150px", borderRadius: "50%" }}
+              />
+            ) : (
+              <div
+                style={{
+                  width: "150px",
+                  height: "150px",
+                  borderRadius: "50%",
+                  backgroundColor: "#ccc",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  margin: "0 auto",
+                }}
+              >
+                Chưa có ảnh
+              </div>
+            )}
+          </div>
           <table className="table table-bordered">
             <tbody>
               <tr>
