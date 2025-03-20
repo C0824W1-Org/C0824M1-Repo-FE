@@ -6,6 +6,16 @@ const ViewsProfile = () => {
   const navigate = useNavigate();
   const { userLogin } = useSelector((state) => state.auth);
 
+  // Hàm định dạng ngày thành "ngày/tháng/năm"
+  const formatDate = (dateString) => {
+    if (!dateString) return "Chưa cập nhật"; // Xử lý trường hợp không có ngày sinh
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // getMonth() bắt đầu từ 0
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
   // Kiểm tra nếu không có thông tin người dùng
   if (!userLogin || Object.keys(userLogin).length === 0) {
     return (
@@ -63,7 +73,7 @@ const ViewsProfile = () => {
                 <th className="fw-bold" scope="row">
                   Ngày sinh
                 </th>
-                <td>{personalInfo.dateOfBirth}</td>
+                <td>{formatDate(personalInfo.dateOfBirth)}</td>
               </tr>
               <tr>
                 <th className="fw-bold" scope="row">

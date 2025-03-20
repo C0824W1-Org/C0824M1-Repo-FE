@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import { Modal, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { Pagination } from "antd";
 
 const ListProducts = () => {
   const navigate = useNavigate();
@@ -16,7 +17,11 @@ const ListProducts = () => {
     brand: "",
   });
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [productToDelete, setProductToDelete] = useState(null);
+  const [productToDelete, setProductToDelete] = useState(null); // Xóa đơn
+  const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false); // Xóa nhiều
+  const [selectedProducts, setSelectedProducts] = useState([]); // Danh sách sản phẩm được chọn
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(6);
 
   // Lấy danh sách sản phẩm khi component mount
   useEffect(() => {
@@ -48,6 +53,8 @@ const ListProducts = () => {
       ...prev,
       [name]: value,
     }));
+    setCurrentPage(1);
+    setSelectedProducts([]); // Reset danh sách chọn khi tìm kiếm
   };
 
   // Lọc sản phẩm dựa trên tiêu chí tìm kiếm
@@ -64,7 +71,30 @@ const ListProducts = () => {
     setFilteredProducts(filtered);
   }, [searchCriteria, products]);
 
-  // Xử lý xóa sản phẩm
+  // Xử lý chọn/tỏa chọn sản phẩm
+  const handleSelectProduct = (id) => {
+    setSelectedProducts((prev) =>
+      prev.includes(id) ? prev.filter((pid) => pid !== id) : [...prev, id]
+    );
+  };
+
+  // Xử lý chọn/tỏa chọn tất cả sản phẩm trên trang hiện tại
+  const handleSelectAll = (e) => {
+    const isChecked = e.target.checked;
+    if (isChecked) {
+      const currentPageIds = currentProducts.map((product) => product.id);
+      setSelectedProducts((prev) => [
+        ...new Set([...prev, ...currentPageIds]), // Loại bỏ trùng lặp
+      ]);
+    } else {
+      const currentPageIds = currentProducts.map((product) => product.id);
+      setSelectedProducts((prev) =>
+        prev.filter((id) => !currentPageIds.includes(id))
+      );
+    }
+  };
+
+  // Xử lý xóa một sản phẩm
   const handleDelete = async (id) => {
     try {
       await ProductsService.deleteProduct(id);
@@ -74,7 +104,11 @@ const ListProducts = () => {
       setFilteredProducts((prevProducts) =>
         prevProducts.filter((product) => product.id !== id)
       );
+      setSelectedProducts((prev) => prev.filter((pid) => pid !== id));
       toast.success("Xóa hàng hóa thành công!");
+      if (filteredProducts.length <= (currentPage - 1) * pageSize + 1) {
+        setCurrentPage((prev) => Math.max(prev - 1, 1));
+      }
     } catch (err) {
       console.error("Lỗi khi xóa hàng hóa:", err.response || err.message);
       toast.error(
@@ -84,15 +118,43 @@ const ListProducts = () => {
       );
     } finally {
       setShowDeleteModal(false);
+      setProductToDelete(null);
     }
   };
 
-  // Điều hướng đến trang thêm sản phẩm
+  // Xử lý xóa nhiều sản phẩm
+  const handleBulkDelete = async () => {
+    try {
+      await Promise.all(
+        selectedProducts.map((id) => ProductsService.deleteProduct(id))
+      );
+      setProducts((prevProducts) =>
+        prevProducts.filter((product) => !selectedProducts.includes(product.id))
+      );
+      setFilteredProducts((prevProducts) =>
+        prevProducts.filter((product) => !selectedProducts.includes(product.id))
+      );
+      setSelectedProducts([]);
+      toast.success(`Xóa ${selectedProducts.length} hàng hóa thành công!`);
+      if (filteredProducts.length <= (currentPage - 1) * pageSize + 1) {
+        setCurrentPage((prev) => Math.max(prev - 1, 1));
+      }
+    } catch (err) {
+      console.error("Lỗi khi xóa hàng hóa:", err.response || err.message);
+      toast.error(
+        err.response?.data?.message ||
+          err.message ||
+          "Có lỗi xảy ra khi xóa hàng hóa."
+      );
+    } finally {
+      setShowBulkDeleteModal(false);
+    }
+  };
+
   const handleAdd = () => {
     navigate("/admin/add-products");
   };
 
-  // Điều hướng đến trang chỉnh sửa sản phẩm
   const handleEdit = (id) => {
     navigate(`/admin/edit-products/${id}`);
   };
@@ -103,23 +165,42 @@ const ListProducts = () => {
     setShowDeleteModal(true);
   };
 
-  // Đóng modal
+  // Đóng modal xóa
   const handleCloseDeleteModal = () => {
     setShowDeleteModal(false);
     setProductToDelete(null);
   };
 
-  // Hiển thị loading
-  if (loading) {
-    return (
-      <div className="text-center py-5">Đang tải danh sách hàng hóa...</div>
-    );
-  }
+  // Hiển thị modal xác nhận xóa nhiều
+  const handleShowBulkDeleteModal = () => {
+    if (selectedProducts.length > 0) {
+      setShowBulkDeleteModal(true);
+    }
+  };
 
-  // Hiển thị lỗi nếu có
-  if (error) {
-    return <div className="alert alert-danger text-center">{error}</div>;
-  }
+  // Đóng modal xóa nhiều
+  const handleCloseBulkDeleteModal = () => {
+    setShowBulkDeleteModal(false);
+  };
+
+  // Xử lý thay đổi trang
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    setSelectedProducts([]); // Reset danh sách chọn khi đổi trang
+  };
+
+  // Tính toán danh sách sản phẩm hiển thị trên trang hiện tại
+  const indexOfLastProduct = currentPage * pageSize;
+  const indexOfFirstProduct = indexOfLastProduct - pageSize;
+  const currentProducts = filteredProducts.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
+  );
+
+  // Kiểm tra xem tất cả sản phẩm trên trang hiện tại đã được chọn chưa
+  const allSelectedOnPage =
+    currentProducts.length > 0 &&
+    currentProducts.every((product) => selectedProducts.includes(product.id));
 
   return (
     <div className="container py-4">
@@ -135,6 +216,14 @@ const ListProducts = () => {
             >
               <FaPlus /> Thêm hàng hóa
             </button>
+            {selectedProducts.length > 0 && (
+              <button
+                className="btn btn-danger fw-bold px-4 py-2 d-flex align-items-center gap-2"
+                onClick={handleShowBulkDeleteModal}
+              >
+                <FaTrash /> Xóa {selectedProducts.length} sản phẩm
+              </button>
+            )}
             <div className="input-group w-auto shadow-sm">
               <span className="input-group-text">
                 <i className="bi bi-search"></i>
@@ -172,20 +261,34 @@ const ListProducts = () => {
             <table className="table table-hover table-bordered align-middle text-center">
               <thead className="table-light">
                 <tr>
-                  <th className="fw-bold text-center">Ảnh</th>
-                  <th className="fw-bold text-center">Tên</th>
-                  <th className="fw-bold text-center">Hãng</th>
-                  <th className="fw-bold text-center">CPU</th>
-                  <th className="fw-bold text-center">Số lượng</th>
-                  <th className="fw-bold text-center">Hệ điều hành</th>
+                  <th className="fw-bold text-center">
+                    <input
+                      type="checkbox"
+                      checked={allSelectedOnPage}
+                      onChange={handleSelectAll}
+                    />
+                  </th>
+                  <th className="fw-bold">Ảnh</th>
+                  <th className="fw-bold">Tên</th>
+                  <th className="fw-bold">Hãng</th>
+                  <th className="fw-bold">CPU</th>
+                  <th className="fw-bold">Số lượng</th>
+                  <th className="fw-bold">Hệ điều hành</th>
                   <th className="fw-bold text-center">Giá</th>
                   <th className="fw-bold text-center">Hành động</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredProducts.map((product) => (
+                {currentProducts.map((product) => (
                   <tr key={product.id}>
                     <td className="text-center align-middle">
+                      <input
+                        type="checkbox"
+                        checked={selectedProducts.includes(product.id)}
+                        onChange={() => handleSelectProduct(product.id)}
+                      />
+                    </td>
+                    <td className="align-middle">
                       {product.image ? (
                         <img
                           src={product.image}
@@ -196,15 +299,11 @@ const ListProducts = () => {
                         "No image"
                       )}
                     </td>
-                    <td className="text-center align-middle">{product.name}</td>
-                    <td className="text-center align-middle">
-                      {product.brand}
-                    </td>
-                    <td className="text-center align-middle">{product.cpu}</td>
-                    <td className="text-center align-middle">
-                      {product.quantity}
-                    </td>
-                    <td className="text-center align-middle">{product.os}</td>
+                    <td className="align-middle">{product.name}</td>
+                    <td className="align-middle">{product.brand}</td>
+                    <td className="align-middle">{product.cpu}</td>
+                    <td className="align-middle">{product.quantity}</td>
+                    <td className="align-middle">{product.os}</td>
                     <td className="text-center align-middle">
                       {product.price.toLocaleString("vi-VN")} VNĐ
                     </td>
@@ -229,9 +328,19 @@ const ListProducts = () => {
               </tbody>
             </table>
           </div>
+          <div className="d-flex justify-content-center mt-4">
+            <Pagination
+              current={currentPage}
+              pageSize={pageSize}
+              total={filteredProducts.length}
+              onChange={handlePageChange}
+              showSizeChanger={false}
+            />
+          </div>
         </div>
       </div>
 
+      {/* Modal xác nhận xóa đơn */}
       <Modal show={showDeleteModal} onHide={handleCloseDeleteModal} centered>
         <Modal.Header closeButton>
           <Modal.Title>Xác nhận xóa</Modal.Title>
@@ -248,6 +357,29 @@ const ListProducts = () => {
             Xóa
           </Button>
           <Button variant="secondary" onClick={handleCloseDeleteModal}>
+            Hủy
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Modal xác nhận xóa nhiều */}
+      <Modal
+        show={showBulkDeleteModal}
+        onHide={handleCloseBulkDeleteModal}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Xác nhận xóa nhiều sản phẩm</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Bạn có chắc chắn muốn xóa {selectedProducts.length} sản phẩm đã chọn
+          không? Hành động này không thể hoàn tác.
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="danger" onClick={handleBulkDelete}>
+            Xóa
+          </Button>
+          <Button variant="secondary" onClick={handleCloseBulkDeleteModal}>
             Hủy
           </Button>
         </Modal.Footer>

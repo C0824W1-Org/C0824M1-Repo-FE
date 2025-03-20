@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import { Modal, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { Pagination } from "antd";
 
 const ListSuppliers = () => {
   const navigate = useNavigate();
@@ -18,6 +19,10 @@ const ListSuppliers = () => {
   });
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [supplierToDelete, setSupplierToDelete] = useState(null);
+  const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
+  const [selectedSuppliers, setSelectedSuppliers] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(6);
 
   useEffect(() => {
     const fetchSuppliers = async () => {
@@ -41,6 +46,8 @@ const ListSuppliers = () => {
       ...prev,
       [name]: value,
     }));
+    setCurrentPage(1);
+    setSelectedSuppliers([]);
   };
 
   useEffect(() => {
@@ -57,6 +64,27 @@ const ListSuppliers = () => {
     setFilteredSuppliers(filtered);
   }, [searchCriteria, suppliers]);
 
+  const handleSelectSupplier = (id) => {
+    setSelectedSuppliers((prev) =>
+      prev.includes(id) ? prev.filter((sid) => sid !== id) : [...prev, id]
+    );
+  };
+
+  const handleSelectAll = (e) => {
+    const isChecked = e.target.checked;
+    if (isChecked) {
+      const currentPageIds = currentSuppliers.map((supplier) => supplier.id);
+      setSelectedSuppliers((prev) => [
+        ...new Set([...prev, ...currentPageIds]),
+      ]);
+    } else {
+      const currentPageIds = currentSuppliers.map((supplier) => supplier.id);
+      setSelectedSuppliers((prev) =>
+        prev.filter((id) => !currentPageIds.includes(id))
+      );
+    }
+  };
+
   const handleDelete = async (id) => {
     try {
       await SuppliersService.deleteSupplier(id);
@@ -66,11 +94,43 @@ const ListSuppliers = () => {
       setFilteredSuppliers((prevSuppliers) =>
         prevSuppliers.filter((supplier) => supplier.id !== id)
       );
+      setSelectedSuppliers((prev) => prev.filter((sid) => sid !== id));
       toast.success("Xóa nhà cung cấp thành công!");
+      if (filteredSuppliers.length <= (currentPage - 1) * pageSize + 1) {
+        setCurrentPage((prev) => Math.max(prev - 1, 1));
+      }
     } catch (err) {
       toast.error("Có lỗi xảy ra khi xóa nhà cung cấp.");
     } finally {
       setShowDeleteModal(false);
+      setSupplierToDelete(null);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    try {
+      await Promise.all(
+        selectedSuppliers.map((id) => SuppliersService.deleteSupplier(id))
+      );
+      setSuppliers((prevSuppliers) =>
+        prevSuppliers.filter(
+          (supplier) => !selectedSuppliers.includes(supplier.id)
+        )
+      );
+      setFilteredSuppliers((prevSuppliers) =>
+        prevSuppliers.filter(
+          (supplier) => !selectedSuppliers.includes(supplier.id)
+        )
+      );
+      setSelectedSuppliers([]);
+      toast.success(`Xóa ${selectedSuppliers.length} nhà cung cấp thành công!`);
+      if (filteredSuppliers.length <= (currentPage - 1) * pageSize + 1) {
+        setCurrentPage((prev) => Math.max(prev - 1, 1));
+      }
+    } catch (err) {
+      toast.error("Có lỗi xảy ra khi xóa nhà cung cấp.");
+    } finally {
+      setShowBulkDeleteModal(false);
     }
   };
 
@@ -91,6 +151,34 @@ const ListSuppliers = () => {
     setShowDeleteModal(false);
     setSupplierToDelete(null);
   };
+
+  const handleShowBulkDeleteModal = () => {
+    if (selectedSuppliers.length > 0) {
+      setShowBulkDeleteModal(true);
+    }
+  };
+
+  const handleCloseBulkDeleteModal = () => {
+    setShowBulkDeleteModal(false);
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    setSelectedSuppliers([]);
+  };
+
+  const indexOfLastSupplier = currentPage * pageSize;
+  const indexOfFirstSupplier = indexOfLastSupplier - pageSize;
+  const currentSuppliers = filteredSuppliers.slice(
+    indexOfFirstSupplier,
+    indexOfLastSupplier
+  );
+
+  const allSelectedOnPage =
+    currentSuppliers.length > 0 &&
+    currentSuppliers.every((supplier) =>
+      selectedSuppliers.includes(supplier.id)
+    );
 
   if (loading) {
     return (
@@ -116,6 +204,14 @@ const ListSuppliers = () => {
             >
               <FaPlus /> Thêm nhà cung cấp
             </button>
+            {selectedSuppliers.length > 0 && (
+              <button
+                className="btn btn-danger fw-bold px-4 py-2 d-flex align-items-center gap-2"
+                onClick={handleShowBulkDeleteModal}
+              >
+                <FaTrash /> Xóa {selectedSuppliers.length} nhà cung cấp
+              </button>
+            )}
             <div className="input-group w-auto shadow-sm">
               <span className="input-group-text">
                 <i className="bi bi-search"></i>
@@ -160,32 +256,36 @@ const ListSuppliers = () => {
             <table className="table table-hover table-bordered align-middle text-center">
               <thead className="table-light">
                 <tr>
-                  <th className="fw-bold text-center">Mã nhà cung cấp</th>
-                  <th className="fw-bold text-center">Tên</th>
-                  <th className="fw-bold text-center">Địa chỉ</th>
-                  <th className="fw-bold text-center">Số điện thoại</th>
-                  <th className="fw-bold text-center">Email</th>
+                  <th className="fw-bold text-center">
+                    <input
+                      type="checkbox"
+                      checked={allSelectedOnPage}
+                      onChange={handleSelectAll}
+                    />
+                  </th>
+                  <th className="fw-bold">Mã nhà cung cấp</th>
+                  <th className="fw-bold">Tên</th>
+                  <th className="fw-bold">Địa chỉ</th>
+                  <th className="fw-bold">Số điện thoại</th>
+                  <th className="fw-bold">Email</th>
                   <th className="fw-bold text-center">Hành động</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredSuppliers.map((supplier) => (
+                {currentSuppliers.map((supplier) => (
                   <tr key={supplier.id}>
                     <td className="text-center align-middle">
-                      {supplier.supplierCode}
+                      <input
+                        type="checkbox"
+                        checked={selectedSuppliers.includes(supplier.id)}
+                        onChange={() => handleSelectSupplier(supplier.id)}
+                      />
                     </td>
-                    <td className="text-center align-middle">
-                      {supplier.name}
-                    </td>
-                    <td className="text-center align-middle">
-                      {supplier.address}
-                    </td>
-                    <td className="text-center align-middle">
-                      {supplier.phone}
-                    </td>
-                    <td className="text-center align-middle">
-                      {supplier.email}
-                    </td>
+                    <td className="align-middle">{supplier.supplierCode}</td>
+                    <td className="align-middle">{supplier.name}</td>
+                    <td className="align-middle">{supplier.address}</td>
+                    <td className="align-middle">{supplier.phone}</td>
+                    <td className="align-middle">{supplier.email}</td>
                     <td className="text-center align-middle">
                       <div className="d-flex gap-2 justify-content-center">
                         <button
@@ -207,6 +307,15 @@ const ListSuppliers = () => {
               </tbody>
             </table>
           </div>
+          <div className="d-flex justify-content-center mt-4">
+            <Pagination
+              current={currentPage}
+              pageSize={pageSize}
+              total={filteredSuppliers.length}
+              onChange={handlePageChange}
+              showSizeChanger={false}
+            />
+          </div>
         </div>
       </div>
 
@@ -226,6 +335,28 @@ const ListSuppliers = () => {
             Xóa
           </Button>
           <Button variant="secondary" onClick={handleCloseDeleteModal}>
+            Hủy
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal
+        show={showBulkDeleteModal}
+        onHide={handleCloseBulkDeleteModal}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Xác nhận xóa nhiều nhà cung cấp</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Bạn có chắc chắn muốn xóa {selectedSuppliers.length} nhà cung cấp đã
+          chọn không? Hành động này không thể hoàn tác.
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="danger" onClick={handleBulkDelete}>
+            Xóa
+          </Button>
+          <Button variant="secondary" onClick={handleCloseBulkDeleteModal}>
             Hủy
           </Button>
         </Modal.Footer>

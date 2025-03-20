@@ -3,33 +3,37 @@ import SalesService from "../../../services/Sales.service";
 import { useNavigate } from "react-router-dom";
 import { Modal, Button, Form } from "react-bootstrap";
 import { toast } from "react-toastify";
+import { Pagination } from "antd";
 
 const RevenueManagement = () => {
   const navigate = useNavigate();
-  const [sales, setSales] = useState([]); // Khởi tạo mặc định là mảng rỗng
+  const [sales, setSales] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedSale, setSelectedSale] = useState(null);
+  const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
+  const [selectedSales, setSelectedSales] = useState([]);
   const [showCustomRangeModal, setShowCustomRangeModal] = useState(false);
   const [customRange, setCustomRange] = useState({
     startDate: "",
     endDate: "",
   });
   const [customRevenue, setCustomRevenue] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(6);
 
   // Lấy dữ liệu giao dịch từ API
   useEffect(() => {
     const fetchSales = async () => {
       try {
         const response = await SalesService.getAllSales();
-        console.log("Dữ liệu từ json-server:", response); // Debug dữ liệu
-        // Kiểm tra dữ liệu có phải mảng không
+        console.log("Dữ liệu từ json-server:", response);
         if (Array.isArray(response)) {
           setSales(response);
         } else {
           console.error("Dữ liệu không phải mảng:", response);
-          setSales([]); // Đặt lại thành mảng rỗng nếu không đúng
+          setSales([]);
           toast.error("Dữ liệu từ server không đúng định dạng.");
         }
         setLoading(false);
@@ -66,6 +70,27 @@ const RevenueManagement = () => {
 
   const revenueStats = calculateRevenueStats();
 
+  // Xử lý chọn/tỏa chọn giao dịch
+  const handleSelectSale = (id) => {
+    setSelectedSales((prev) =>
+      prev.includes(id) ? prev.filter((sid) => sid !== id) : [...prev, id]
+    );
+  };
+
+  // Xử lý chọn/tỏa chọn tất cả giao dịch trên trang hiện tại
+  const handleSelectAll = (e) => {
+    const isChecked = e.target.checked;
+    if (isChecked) {
+      const currentPageIds = currentSales.map((sale) => sale.id);
+      setSelectedSales((prev) => [...new Set([...prev, ...currentPageIds])]);
+    } else {
+      const currentPageIds = currentSales.map((sale) => sale.id);
+      setSelectedSales((prev) =>
+        prev.filter((id) => !currentPageIds.includes(id))
+      );
+    }
+  };
+
   // Xử lý quay lại trang quản lý bán hàng
   const handleBackToSales = () => {
     navigate("/admin/sales-management");
@@ -76,24 +101,47 @@ const RevenueManagement = () => {
     navigate(`/admin/edit-sale/${saleId}`);
   };
 
-  // Xử lý mở modal xóa
+  // Xử lý mở modal xóa đơn
   const handleDeleteClick = (sale) => {
     setSelectedSale(sale);
     setShowDeleteModal(true);
   };
 
-  // Xử lý xác nhận xóa
+  // Xử lý xác nhận xóa đơn
   const handleConfirmDelete = async () => {
     if (!selectedSale) return;
     try {
       await SalesService.deleteSale(selectedSale.id);
       setSales((prev) => prev.filter((sale) => sale.id !== selectedSale.id));
+      setSelectedSales((prev) => prev.filter((sid) => sid !== selectedSale.id));
       toast.success("Xóa giao dịch thành công!");
+      if (sales.length <= (currentPage - 1) * pageSize + 1) {
+        setCurrentPage((prev) => Math.max(prev - 1, 1));
+      }
       setShowDeleteModal(false);
       setSelectedSale(null);
     } catch (err) {
       toast.error(`Có lỗi khi xóa giao dịch: ${err.message}`);
       console.error("Lỗi xóa:", err);
+    }
+  };
+
+  // Xử lý xóa nhiều giao dịch
+  const handleBulkDelete = async () => {
+    try {
+      await Promise.all(selectedSales.map((id) => SalesService.deleteSale(id)));
+      setSales((prev) =>
+        prev.filter((sale) => !selectedSales.includes(sale.id))
+      );
+      setSelectedSales([]);
+      toast.success(`Xóa ${selectedSales.length} giao dịch thành công!`);
+      if (sales.length <= (currentPage - 1) * pageSize + 1) {
+        setCurrentPage((prev) => Math.max(prev - 1, 1));
+      }
+    } catch (err) {
+      toast.error(`Có lỗi khi xóa giao dịch: ${err.message}`);
+    } finally {
+      setShowBulkDeleteModal(false);
     }
   };
 
@@ -125,6 +173,22 @@ const RevenueManagement = () => {
     setShowCustomRangeModal(false);
   };
 
+  // Xử lý thay đổi trang
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    setSelectedSales([]);
+  };
+
+  // Tính toán danh sách giao dịch trên trang hiện tại
+  const indexOfLastSale = currentPage * pageSize;
+  const indexOfFirstSale = indexOfLastSale - pageSize;
+  const currentSales = sales.slice(indexOfFirstSale, indexOfLastSale);
+
+  // Kiểm tra xem tất cả giao dịch trên trang hiện tại đã được chọn chưa
+  const allSelectedOnPage =
+    currentSales.length > 0 &&
+    currentSales.every((sale) => selectedSales.includes(sale.id));
+
   if (loading) {
     return (
       <div className="text-center py-5">Đang tải danh sách doanh thu...</div>
@@ -144,66 +208,100 @@ const RevenueManagement = () => {
           {sales.length === 0 ? (
             <p className="text-center">Không có giao dịch nào để hiển thị.</p>
           ) : (
-            <table className="table table-bordered table-hover">
-              <thead>
-                <tr>
-                  <th>Họ và tên</th>
-                  <th>Số điện thoại</th>
-                  <th>Sản phẩm</th>
-                  <th>Giá</th>
-                  <th>Số lượng</th>
-                  <th>Tổng tiền</th>
-                  <th>Ngày giao dịch</th>
-                  <th>Hành động</th>
-                </tr>
-              </thead>
-              <tbody>
-                {sales.map((sale) => (
-                  <tr key={sale.id}>
-                    <td>{sale.customer.fullName}</td>
-                    <td>{sale.customer.phone}</td>
-                    <td>
-                      {sale.products && Array.isArray(sale.products)
-                        ? sale.products.map((p) => p.name).join(", ")
-                        : "Không có sản phẩm"}
-                    </td>
-                    <td>
-                      {sale.products && Array.isArray(sale.products)
-                        ? sale.products
-                            .map(
-                              (p) => `${p.price.toLocaleString("vi-VN")} VNĐ`
-                            )
-                            .join(", ")
-                        : "N/A"}
-                    </td>
-                    <td>
-                      {sale.products && Array.isArray(sale.products)
-                        ? sale.products.map((p) => p.quantity).join(", ")
-                        : "N/A"}
-                    </td>
-                    <td>{sale.totalAmount.toLocaleString("vi-VN")} VNĐ</td>
-                    <td>{new Date(sale.date).toLocaleString("vi-VN")}</td>
-                    <td>
-                      <Button
-                        variant="warning"
-                        size="sm"
-                        className="me-2"
-                        onClick={() => handleEditClick(sale.id)}
-                      >
-                        Sửa
-                      </Button>
-                      <Button
-                        variant="danger"
-                        size="sm"
-                        onClick={() => handleDeleteClick(sale)}
-                      >
-                        Xóa
-                      </Button>
-                    </td>
+            <>
+              {selectedSales.length > 0 && (
+                <Button
+                  variant="danger"
+                  className="mb-3"
+                  onClick={() => setShowBulkDeleteModal(true)}
+                >
+                  Xóa {selectedSales.length} giao dịch
+                </Button>
+              )}
+              <table className="table table-bordered table-hover">
+                <thead>
+                  <tr>
+                    <th>
+                      <input
+                        type="checkbox"
+                        checked={allSelectedOnPage}
+                        onChange={handleSelectAll}
+                      />
+                    </th>
+                    <th className="fw-bold">Họ và tên</th>
+                    <th className="fw-bold">Số điện thoại</th>
+                    <th className="fw-bold">Sản phẩm</th>
+                    <th className="fw-bold">Giá</th>
+                    <th className="fw-bold text-center">Số lượng</th>
+                    <th className="fw-bold">Tổng tiền</th>
+                    <th className="fw-bold">Ngày giao dịch</th>
+                    <th className="fw-bold">Hành động</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {currentSales.map((sale) => (
+                    <tr key={sale.id}>
+                      <td>
+                        <input
+                          type="checkbox"
+                          checked={selectedSales.includes(sale.id)}
+                          onChange={() => handleSelectSale(sale.id)}
+                        />
+                      </td>
+                      <td>{sale.customer.fullName}</td>
+                      <td>{sale.customer.phone}</td>
+                      <td>
+                        {sale.products && Array.isArray(sale.products)
+                          ? sale.products.map((p) => p.name).join(", ")
+                          : "Không có sản phẩm"}
+                      </td>
+                      <td>
+                        {sale.products && Array.isArray(sale.products)
+                          ? sale.products
+                              .map(
+                                (p) => `${p.price.toLocaleString("vi-VN")} VNĐ`
+                              )
+                              .join(", ")
+                          : "N/A"}
+                      </td>
+                      <td className="text-center">
+                        {sale.products && Array.isArray(sale.products)
+                          ? sale.products.map((p) => p.quantity).join(", ")
+                          : "N/A"}
+                      </td>
+                      <td>{sale.totalAmount.toLocaleString("vi-VN")} VNĐ</td>
+                      <td>{new Date(sale.date).toLocaleString("vi-VN")}</td>
+                      <td>
+                        <Button
+                          variant="warning"
+                          size="sm"
+                          className="me-2"
+                          onClick={() => handleEditClick(sale.id)}
+                        >
+                          Sửa
+                        </Button>
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          onClick={() => handleDeleteClick(sale)}
+                        >
+                          Xóa
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div className="d-flex justify-content-center mt-4">
+                <Pagination
+                  current={currentPage}
+                  pageSize={pageSize}
+                  total={sales.length}
+                  onChange={handlePageChange}
+                  showSizeChanger={false}
+                />
+              </div>
+            </>
           )}
           <Button
             variant="secondary"
@@ -262,7 +360,7 @@ const RevenueManagement = () => {
         </div>
       </div>
 
-      {/* Modal xác nhận xóa */}
+      {/* Modal xác nhận xóa đơn */}
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Xác nhận xóa giao dịch</Modal.Title>
@@ -276,6 +374,31 @@ const RevenueManagement = () => {
             Hủy
           </Button>
           <Button variant="danger" onClick={handleConfirmDelete}>
+            Xóa
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Modal xác nhận xóa nhiều */}
+      <Modal
+        show={showBulkDeleteModal}
+        onHide={() => setShowBulkDeleteModal(false)}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Xác nhận xóa nhiều giao dịch</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Bạn có chắc chắn muốn xóa {selectedSales.length} giao dịch đã chọn
+          không? Hành động này không thể hoàn tác.
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => setShowBulkDeleteModal(false)}
+          >
+            Hủy
+          </Button>
+          <Button variant="danger" onClick={handleBulkDelete}>
             Xóa
           </Button>
         </Modal.Footer>

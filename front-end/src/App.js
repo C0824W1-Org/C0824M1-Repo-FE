@@ -14,7 +14,8 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import MasterAdmin from "./pages/admin/Master/MasterAdmin";
 import Login from "./pages/Home/Login/Login";
 import { useSelector } from "react-redux";
-
+// import "antd/dist/antd.css"; // Import CSS của Ant Design
+import "antd/dist/reset.css"; // Dùng cho Ant Design v5
 function App() {
   const { isLoggedIn, userLogin } = useSelector((state) => state.auth);
 
