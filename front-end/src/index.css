@@ -1,11 +1,16 @@
-body {
-  margin: 0;
-  font-family: "Roboto", sans-serif !important;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
 code {
   font-family: "Roboto", sans-serif;
   font-size: 18px;
+}
+
+@font-face {
+  font-family: "Roboto";
+  src: url("https://github.com/C0824W1-Org/C0824M1-Repo-FE/blob/main/front-end/public/fonts/Roboto_Condensed-Regular.ttf")
+    format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+body {
+  font-family: "Roboto", sans-serif;
 }

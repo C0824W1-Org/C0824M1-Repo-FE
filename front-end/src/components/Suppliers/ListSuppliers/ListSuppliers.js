@@ -22,7 +22,7 @@ const ListSuppliers = () => {
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
   const [selectedSuppliers, setSelectedSuppliers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize] = useState(6);
+  const [pageSize] = useState(5);
 
   useEffect(() => {
     const fetchSuppliers = async () => {

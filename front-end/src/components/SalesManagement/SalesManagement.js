@@ -1,14 +1,32 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Modal, Button } from "react-bootstrap";
 import CustomersService from "../../services/Customers.service";
 import ProductsService from "../../services/Products.service";
 import SalesService from "../../services/Sales.service";
 import { toast } from "react-toastify";
 import { jsPDF } from "jspdf";
+import html2canvas from "html2canvas";
 import { useNavigate } from "react-router-dom";
+
+// Định dạng tiền tệ
+const formatCurrency = (amount) => {
+  return amount.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
+};
+
+// Định dạng ngày giờ
+const formatDateTime = (date) => {
+  const d = new Date(date);
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const year = d.getFullYear();
+  const hours = String(d.getHours()).padStart(2, "0");
+  const minutes = String(d.getMinutes()).padStart(2, "0");
+  return `${day}/${month}/${year} ${hours}:${minutes}`;
+};
 
 const SalesManagement = () => {
   const navigate = useNavigate();
+  const pdfRef = useRef(); // Ref để tham chiếu đến phần HTML cần chuyển thành PDF
   const [customer, setCustomer] = useState({
     fullName: "",
     phone: "",
@@ -165,37 +183,17 @@ const SalesManagement = () => {
         await ProductsService.updateProductQuantity(product.id, newQuantity);
       }
 
-      // Tạo PDF
-      const doc = new jsPDF();
-      doc.text("HÓA ĐƠN THANH TOÁN", 20, 20);
-      doc.text(`Khách hàng: ${customer.fullName}`, 20, 30);
-      doc.text(`Số điện thoại: ${customer.phone}`, 20, 40);
-      doc.text(`Địa chỉ: ${customer.address}`, 20, 50);
-      doc.text(`Tuổi: ${customer.age}`, 20, 60);
-      doc.text(`Email: ${customer.email || "-"}`, 20, 70);
-      doc.text("Sản phẩm:", 20, 80);
-      selectedProducts.forEach((p, index) => {
-        doc.text(
-          `${index + 1}. ${p.name} - Giá: ${p.price.toLocaleString(
-            "vi-VN"
-          )} VNĐ - Số lượng: ${p.selectedQuantity}`,
-          20,
-          90 + index * 10
-        );
-      });
-      doc.text(
-        `Tổng tiền: ${totalAmount.toLocaleString("vi-VN")} VNĐ`,
-        20,
-        90 + selectedProducts.length * 10 + 10
-      );
-      doc.text(
-        `Hình thức thanh toán: ${
-          paymentMethod === "cash" ? "Tiền mặt" : "Chuyển khoản"
-        }`,
-        20,
-        90 + selectedProducts.length * 10 + 20
-      );
-      doc.save(`HoaDon_${customer.fullName}_${Date.now()}.pdf`);
+      // Tạo PDF từ HTML
+      const element = pdfRef.current;
+      const canvas = await html2canvas(element, { scale: 2 });
+      const imgData = canvas.toDataURL("image/png");
+
+      const pdf = new jsPDF();
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`HoaDon_${customer.fullName}_${Date.now()}.pdf`);
 
       toast.success("Thanh toán thành công!");
       // Điều hướng đến trang doanh thu sau khi thanh toán thành công
@@ -504,6 +502,146 @@ const SalesManagement = () => {
           <Button variant="success" onClick={handlePayment}>
             Tiến hành thanh toán
           </Button>
+        </div>
+      </div>
+
+      {/* Phần HTML ẩn để tạo PDF */}
+      <div style={{ position: "absolute", left: "-9999px" }} ref={pdfRef}>
+        <div
+          style={{
+            width: "595px", // Tương ứng với chiều rộng A4 (210mm) ở 72dpi
+            padding: "20px",
+            fontFamily: "'Roboto', sans-serif",
+            fontSize: "12px",
+            lineHeight: "1.5",
+          }}
+        >
+          <h1
+            style={{
+              textAlign: "center",
+              fontSize: "18px",
+              marginBottom: "10px",
+            }}
+          >
+            HÓA ĐƠN THANH TOÁN
+          </h1>
+          <p
+            style={{
+              textAlign: "center",
+              fontSize: "12px",
+              marginBottom: "20px",
+            }}
+          >
+            Ngày in: {formatDateTime(new Date())}
+          </p>
+          <hr style={{ border: "1px solid #000", margin: "10px 0" }} />
+          <h2 style={{ fontSize: "14px", marginBottom: "10px" }}>
+            THÔNG TIN KHÁCH HÀNG
+          </h2>
+          <p>Khách hàng: {customer.fullName}</p>
+          <p>Số điện thoại: {customer.phone}</p>
+          <p>Địa chỉ: {customer.address}</p>
+          <p>Tuổi: {customer.age}</p>
+          <p>Email: {customer.email || "-"}</p>
+          <hr style={{ border: "1px solid #000", margin: "10px 0" }} />
+          <h2 style={{ fontSize: "14px", marginBottom: "10px" }}>
+            DANH SÁCH SẢN PHẨM
+          </h2>
+          <table
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              marginBottom: "20px",
+            }}
+          >
+            <thead>
+              <tr>
+                <th
+                  style={{
+                    border: "1px solid #000",
+                    padding: "5px",
+                    textAlign: "left",
+                  }}
+                >
+                  STT
+                </th>
+                <th
+                  style={{
+                    border: "1px solid #000",
+                    padding: "5px",
+                    textAlign: "left",
+                  }}
+                >
+                  Tên sản phẩm
+                </th>
+                <th
+                  style={{
+                    border: "1px solid #000",
+                    padding: "5px",
+                    textAlign: "left",
+                  }}
+                >
+                  Giá
+                </th>
+                <th
+                  style={{
+                    border: "1px solid #000",
+                    padding: "5px",
+                    textAlign: "left",
+                  }}
+                >
+                  Số lượng
+                </th>
+                <th
+                  style={{
+                    border: "1px solid #000",
+                    padding: "5px",
+                    textAlign: "left",
+                  }}
+                >
+                  Thành tiền
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {selectedProducts.map((p, index) => (
+                <tr key={p.id}>
+                  <td style={{ border: "1px solid #000", padding: "5px" }}>
+                    {index + 1}.
+                  </td>
+                  <td style={{ border: "1px solid #000", padding: "5px" }}>
+                    {p.name}
+                  </td>
+                  <td style={{ border: "1px solid #000", padding: "5px" }}>
+                    {formatCurrency(p.price)}
+                  </td>
+                  <td style={{ border: "1px solid #000", padding: "5px" }}>
+                    {p.selectedQuantity}
+                  </td>
+                  <td style={{ border: "1px solid #000", padding: "5px" }}>
+                    {formatCurrency(p.price * p.selectedQuantity)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <hr style={{ border: "1px solid #000", margin: "10px 0" }} />
+          <p style={{ fontSize: "14px", fontWeight: "bold" }}>
+            Tổng tiền: {formatCurrency(totalAmount)}
+          </p>
+          <p>
+            Hình thức thanh toán:{" "}
+            {paymentMethod === "cash" ? "Tiền mặt" : "Chuyển khoản"}
+          </p>
+          <p
+            style={{
+              textAlign: "center",
+              fontStyle: "italic",
+              marginTop: "20px",
+            }}
+          >
+            Cảm ơn quý khách đã mua hàng!
+          </p>
         </div>
       </div>
     </div>

@@ -21,7 +21,7 @@ const ListProducts = () => {
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false); // Xóa nhiều
   const [selectedProducts, setSelectedProducts] = useState([]); // Danh sách sản phẩm được chọn
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize] = useState(6);
+  const [pageSize] = useState(5);
 
   // Lấy danh sách sản phẩm khi component mount
   useEffect(() => {

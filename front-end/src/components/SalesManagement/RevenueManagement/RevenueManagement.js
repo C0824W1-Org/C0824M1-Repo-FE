@@ -21,7 +21,7 @@ const RevenueManagement = () => {
   });
   const [customRevenue, setCustomRevenue] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize] = useState(6);
+  const [pageSize] = useState(5);
 
   // Lấy dữ liệu giao dịch từ API
   useEffect(() => {

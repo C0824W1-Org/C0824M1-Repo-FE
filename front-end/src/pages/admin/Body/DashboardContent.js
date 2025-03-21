@@ -80,9 +80,9 @@ const DashboardContent = () => {
           <div className="card shadow-sm h-100">
             <div className="card-body text-center">
               <h5 className="card-title text-primary">Tổng số sản phẩm</h5>
-              <p className="card-text display-4">{stats.totalProducts}</p>
+              <p className="card-text display-6 mt-5">{stats.totalProducts}</p>
               <button
-                className="btn btn-outline-primary mt-3"
+                className="btn btn-outline-primary "
                 onClick={handleViewProducts}
               >
                 Xem danh sách sản phẩm
@@ -96,11 +96,11 @@ const DashboardContent = () => {
           <div className="card shadow-sm h-100">
             <div className="card-body text-center">
               <h5 className="card-title text-success">Tổng doanh thu</h5>
-              <p className="card-text display-4">
+              <p className="card-text display-6 mt-5">
                 {stats.totalRevenue.toLocaleString("vi-VN")} VNĐ
               </p>
               <button
-                className="btn btn-outline-success mt-3"
+                className="btn btn-outline-success "
                 onClick={handleViewRevenue}
               >
                 Xem chi tiết doanh thu
@@ -114,9 +114,9 @@ const DashboardContent = () => {
           <div className="card shadow-sm h-100">
             <div className="card-body text-center">
               <h5 className="card-title text-info">Sản phẩm đã bán</h5>
-              <p className="card-text display-4">{stats.totalSoldItems}</p>
+              <p className="card-text display-6 mt-5">{stats.totalSoldItems}</p>
               <button
-                className="btn btn-outline-info mt-3"
+                className="btn btn-outline-info "
                 onClick={handleViewSales}
               >
                 Xem quản lý bán hàng
@@ -127,7 +127,7 @@ const DashboardContent = () => {
       </div>
 
       {/* Thông tin chào mừng */}
-      <div className="card shadow-sm mt-4">
+      <div className="card shadow-sm mt-5">
         <div className="card-body">
           <h5 className="card-title">Chào mừng đến với Dashboard</h5>
           <p className="card-text">
