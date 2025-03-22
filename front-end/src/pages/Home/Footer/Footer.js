@@ -48,7 +48,7 @@ const Footer = () => {
           </div>
 
           <div className="col-md-3" data-aos="fade-left">
-            <h5 className="fw-bold mb-3">VỀ ĐIỆN THOẠI VUI</h5>
+            <h5 className="fw-bold mb-3">VỀ ĐIỆN THOẠI MODULARS</h5>
             <ul className="list-unstyled small">
               <li className="mb-2"><a href="/" className="footer-link">Khuyến mãi</a></li>
               <li className="mb-2"><a href="/" className="footer-link">Tuyển dụng</a></li>
