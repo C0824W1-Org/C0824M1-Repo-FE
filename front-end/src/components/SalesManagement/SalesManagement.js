@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 import { useNavigate } from "react-router-dom";
+import { Pagination } from "antd"; // Import Pagination từ Ant Design
 
 // Định dạng tiền tệ
 const formatCurrency = (amount) => {
@@ -26,7 +27,7 @@ const formatDateTime = (date) => {
 
 const SalesManagement = () => {
   const navigate = useNavigate();
-  const pdfRef = useRef(); // Ref để tham chiếu đến phần HTML cần chuyển thành PDF
+  const pdfRef = useRef();
   const [customer, setCustomer] = useState({
     fullName: "",
     phone: "",
@@ -50,6 +51,14 @@ const SalesManagement = () => {
   });
   const [selectedCustomerId, setSelectedCustomerId] = useState(null);
   const [totalAmount, setTotalAmount] = useState(0);
+
+  // State cho phân trang khách hàng
+  const [currentPageCustomer, setCurrentPageCustomer] = useState(1);
+  const customersPerPage = 6; // Số khách hàng mỗi trang
+
+  // State cho phân trang sản phẩm
+  const [currentPageProduct, setCurrentPageProduct] = useState(1);
+  const productsPerPage = 6; // Số sản phẩm mỗi trang
 
   // Load danh sách khách hàng và sản phẩm
   useEffect(() => {
@@ -86,12 +95,14 @@ const SalesManagement = () => {
   const handleCustomerSearchChange = (e) => {
     const { name, value } = e.target;
     setSearchCustomer((prev) => ({ ...prev, [name]: value }));
+    setCurrentPageCustomer(1); // Reset về trang 1 khi tìm kiếm
   };
 
   // Xử lý tìm kiếm sản phẩm
   const handleProductSearchChange = (e) => {
     const { name, value } = e.target;
     setSearchProduct((prev) => ({ ...prev, [name]: value }));
+    setCurrentPageProduct(1); // Reset về trang 1 khi tìm kiếm
   };
 
   // Lọc khách hàng
@@ -101,12 +112,40 @@ const SalesManagement = () => {
       : c.phone.includes(searchCustomer.value)
   );
 
+  // Tính toán phân trang khách hàng
+  const totalCustomers = filteredCustomers.length;
+  const indexOfLastCustomer = currentPageCustomer * customersPerPage;
+  const indexOfFirstCustomer = indexOfLastCustomer - customersPerPage;
+  const currentCustomers = filteredCustomers.slice(
+    indexOfFirstCustomer,
+    indexOfLastCustomer
+  );
+
+  // Xử lý chuyển trang khách hàng
+  const handlePageChangeCustomer = (page) => {
+    setCurrentPageCustomer(page);
+  };
+
   // Lọc sản phẩm
   const filteredProducts = products.filter((p) =>
     searchProduct.type === "name"
       ? p.name.toLowerCase().includes(searchProduct.value.toLowerCase())
       : p.brand.toLowerCase().includes(searchProduct.value.toLowerCase())
   );
+
+  // Tính toán phân trang sản phẩm
+  const totalProducts = filteredProducts.length;
+  const indexOfLastProduct = currentPageProduct * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = filteredProducts.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
+  );
+
+  // Xử lý chuyển trang sản phẩm
+  const handlePageChangeProduct = (page) => {
+    setCurrentPageProduct(page);
+  };
 
   // Chọn khách hàng cũ
   const handleSelectCustomer = (customer) => {
@@ -310,7 +349,7 @@ const SalesManagement = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredCustomers.map((c) => (
+                  {currentCustomers.map((c) => (
                     <tr
                       key={c.id}
                       onClick={() => setSelectedCustomerId(c.id)}
@@ -324,6 +363,17 @@ const SalesManagement = () => {
                   ))}
                 </tbody>
               </table>
+
+              {/* Phân trang sử dụng Ant Design cho khách hàng */}
+              <div className="d-flex justify-content-center mt-4">
+                <Pagination
+                  current={currentPageCustomer}
+                  pageSize={customersPerPage}
+                  total={totalCustomers}
+                  onChange={handlePageChangeCustomer}
+                  showSizeChanger={false}
+                />
+              </div>
             </Modal.Body>
             <Modal.Footer>
               <Button
@@ -438,7 +488,7 @@ const SalesManagement = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredProducts.map((p) => (
+                  {currentProducts.map((p) => (
                     <tr key={p.id} onClick={() => handleSelectProduct(p)}>
                       <td>{p.name}</td>
                       <td>{p.brand}</td>
@@ -448,6 +498,17 @@ const SalesManagement = () => {
                   ))}
                 </tbody>
               </table>
+
+              {/* Phân trang sử dụng Ant Design cho sản phẩm */}
+              <div className="d-flex justify-content-center mt-4">
+                <Pagination
+                  current={currentPageProduct}
+                  pageSize={productsPerPage}
+                  total={totalProducts}
+                  onChange={handlePageChangeProduct}
+                  showSizeChanger={false}
+                />
+              </div>
             </Modal.Body>
             <Modal.Footer>
               <Button
@@ -509,9 +570,9 @@ const SalesManagement = () => {
       <div style={{ position: "absolute", left: "-9999px" }} ref={pdfRef}>
         <div
           style={{
-            width: "595px", // Tương ứng với chiều rộng A4 (210mm) ở 72dpi
+            width: "595px",
             padding: "20px",
-            fontFamily: "'Roboto', sans-serif",
+            fontFamily: "'Arial', sans-serif",
             fontSize: "12px",
             lineHeight: "1.5",
           }}
