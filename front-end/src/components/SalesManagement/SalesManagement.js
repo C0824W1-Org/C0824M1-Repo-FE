@@ -8,7 +8,7 @@ import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 import { useNavigate } from "react-router-dom";
 import { Pagination } from "antd"; // Import Pagination từ Ant Design
-
+import qrCode from "../../pages/assets/img/qr_code.jpg";
 // Định dạng tiền tệ
 const formatCurrency = (amount) => {
   return amount.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
@@ -551,11 +551,7 @@ const SalesManagement = () => {
               </label>
               {paymentMethod === "transfer" && (
                 <div className="mt-2">
-                  <img
-                    src="https://cdn.tgdd.vn/Products/Images/42/334864/iphone-16e-thumb-600x600.jpg"
-                    alt="QR Code"
-                    style={{ width: "150px" }}
-                  />
+                  <img src={qrCode} alt="QR Code" style={{ width: "150px" }} />
                 </div>
               )}
             </div>
