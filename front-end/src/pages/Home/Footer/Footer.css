@@ -1,0 +1,11 @@
+.footer-link {
+    color: #fffafa;
+    text-decoration: none;
+    transition: color 0.3s ease, text-decoration 0.3s ease;
+  }
+  
+  .footer-link:hover {
+    color: #007bff; /* Bootstrap primary color */
+    text-decoration: underline;
+  }
+  
