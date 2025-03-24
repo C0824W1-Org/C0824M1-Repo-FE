@@ -7,8 +7,9 @@ import { toast } from "react-toastify";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 import { useNavigate } from "react-router-dom";
-import { Pagination } from "antd"; // Import Pagination từ Ant Design
+import { Pagination } from "antd";
 import qrCode from "../../pages/assets/img/qr_code.jpg";
+
 // Định dạng tiền tệ
 const formatCurrency = (amount) => {
   return amount.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
@@ -54,11 +55,11 @@ const SalesManagement = () => {
 
   // State cho phân trang khách hàng
   const [currentPageCustomer, setCurrentPageCustomer] = useState(1);
-  const customersPerPage = 6; // Số khách hàng mỗi trang
+  const customersPerPage = 6;
 
   // State cho phân trang sản phẩm
   const [currentPageProduct, setCurrentPageProduct] = useState(1);
-  const productsPerPage = 6; // Số sản phẩm mỗi trang
+  const productsPerPage = 6;
 
   // Load danh sách khách hàng và sản phẩm
   useEffect(() => {
@@ -95,14 +96,14 @@ const SalesManagement = () => {
   const handleCustomerSearchChange = (e) => {
     const { name, value } = e.target;
     setSearchCustomer((prev) => ({ ...prev, [name]: value }));
-    setCurrentPageCustomer(1); // Reset về trang 1 khi tìm kiếm
+    setCurrentPageCustomer(1);
   };
 
   // Xử lý tìm kiếm sản phẩm
   const handleProductSearchChange = (e) => {
     const { name, value } = e.target;
     setSearchProduct((prev) => ({ ...prev, [name]: value }));
-    setCurrentPageProduct(1); // Reset về trang 1 khi tìm kiếm
+    setCurrentPageProduct(1);
   };
 
   // Lọc khách hàng
@@ -156,6 +157,10 @@ const SalesManagement = () => {
 
   // Thêm sản phẩm vào danh sách đã chọn
   const handleSelectProduct = (product) => {
+    if (product.quantity <= 0) {
+      toast.error(`Sản phẩm ${product.name} đã hết hàng!`);
+      return;
+    }
     if (!selectedProducts.some((p) => p.id === product.id)) {
       setSelectedProducts((prev) => [...prev, { ...product }]);
     }
@@ -165,6 +170,11 @@ const SalesManagement = () => {
   // Thay đổi số lượng sản phẩm
   const handleQuantityChange = (productId, value) => {
     const newQuantity = Math.max(1, parseInt(value) || 1);
+    const product = products.find((p) => p.id === productId);
+    if (newQuantity > product.quantity) {
+      toast.error(`Số lượng tồn kho của ${product.name} không đủ!`);
+      return;
+    }
     setSelectedProducts((prev) =>
       prev.map((p) =>
         p.id === productId ? { ...p, selectedQuantity: newQuantity } : p
@@ -235,7 +245,6 @@ const SalesManagement = () => {
       pdf.save(`HoaDon_${customer.fullName}_${Date.now()}.pdf`);
 
       toast.success("Thanh toán thành công!");
-      // Điều hướng đến trang doanh thu sau khi thanh toán thành công
       navigate("/admin/revenue-management");
     } catch (err) {
       console.error("Lỗi trong handlePayment:", err.response || err.message);
@@ -244,127 +253,159 @@ const SalesManagement = () => {
   };
 
   return (
-    <div className="content container-fluid p-4">
-      <h2 className="mb-4">Quản lý bán hàng</h2>
-      <div className="card shadow-sm">
+    <div className="container py-4">
+      <div className="card shadow-lg rounded-3 border-0">
         <div className="card-body">
-          <div className="mb-3">
-            <h6 className="mb-3">Thông tin khách hàng</h6>
-            <Button
-              variant="primary"
-              onClick={() => setShowCustomerModal(true)}
-              className="mb-4"
-            >
-              Chọn khách hàng cũ
-            </Button>
-            <div className="row">
-              <div className="col-md-4">
-                <label>Họ và tên</label>
+          <h4 className="card-title text-center text-primary fw-bold mb-4">
+            Quản lý bán hàng
+          </h4>
+
+          {/* Thông tin khách hàng */}
+          <div className="mb-4">
+            <h5 className="fw-bold mb-3">Thông tin khách hàng</h5>
+            <div className="d-flex justify-content-end mb-3">
+              <button
+                className="btn btn-primary fw-bold px-4 py-2 d-flex align-items-center gap-2"
+                onClick={() => setShowCustomerModal(true)}
+              >
+                <i className="bi bi-person-plus-fill"></i> Chọn khách hàng cũ
+              </button>
+            </div>
+            <div className="row g-3">
+              <div className="col-md-6">
+                <label className="form-label fw-bold">
+                  Họ và tên <span className="text-danger">*</span>
+                </label>
                 <input
                   type="text"
                   className="form-control"
                   name="fullName"
                   value={customer.fullName}
                   onChange={handleCustomerChange}
+                  placeholder="Nhập họ và tên"
                   required
                 />
               </div>
-              <div className="col-md-4">
-                <label>Số điện thoại</label>
+              <div className="col-md-6">
+                <label className="form-label fw-bold">
+                  Số điện thoại <span className="text-danger">*</span>
+                </label>
                 <input
                   type="text"
                   className="form-control"
                   name="phone"
                   value={customer.phone}
                   onChange={handleCustomerChange}
+                  placeholder="Nhập số điện thoại"
                   required
                 />
               </div>
-              <div className="col-md-4">
-                <label>Địa chỉ</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  name="address"
-                  value={customer.address}
-                  onChange={handleCustomerChange}
-                  required
-                />
-              </div>
-              <div className="col-md-4 mt-2">
-                <label>Tuổi</label>
+              <div className="col-md-6">
+                <label className="form-label fw-bold">
+                  Tuổi <span className="text-danger">*</span>
+                </label>
                 <input
                   type="number"
                   className="form-control"
                   name="age"
                   value={customer.age}
                   onChange={handleCustomerChange}
+                  placeholder="Nhập tuổi"
                   required
                 />
               </div>
-              <div className="col-md-4 mt-2">
-                <label>Email (không bắt buộc)</label>
+              <div className="col-md-6">
+                <label className="form-label fw-bold">Email</label>
                 <input
                   type="email"
                   className="form-control"
                   name="email"
                   value={customer.email}
                   onChange={handleCustomerChange}
+                  placeholder="Nhập email (ví dụ: customer@domain.com)"
+                />
+              </div>
+              <div className="col-12">
+                <label className="form-label fw-bold">
+                  Địa chỉ <span className="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="address"
+                  value={customer.address}
+                  onChange={handleCustomerChange}
+                  placeholder="Nhập địa chỉ"
+                  required
                 />
               </div>
             </div>
           </div>
+
+          {/* Modal chọn khách hàng */}
           <Modal
             show={showCustomerModal}
             onHide={() => setShowCustomerModal(false)}
+            centered
           >
             <Modal.Header closeButton>
               <Modal.Title>Chọn khách hàng cũ</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <div className="d-flex gap-2 mb-3">
-                <select
-                  className="form-control"
-                  name="type"
-                  value={searchCustomer.type}
-                  onChange={handleCustomerSearchChange}
-                >
-                  <option value="fullName">Tên</option>
-                  <option value="phone">Số điện thoại</option>
-                </select>
-                <input
-                  type="text"
-                  className="form-control"
-                  name="value"
-                  value={searchCustomer.value}
-                  onChange={handleCustomerSearchChange}
-                  placeholder="Tìm kiếm..."
-                />
+              <div className="d-flex gap-3 mb-4">
+                <div className="input-group w-auto shadow-sm">
+                  <span className="input-group-text">
+                    <i className="bi bi-search"></i>
+                  </span>
+                  <select
+                    className="form-select"
+                    name="type"
+                    value={searchCustomer.type}
+                    onChange={handleCustomerSearchChange}
+                  >
+                    <option value="fullName">Tên</option>
+                    <option value="phone">Số điện thoại</option>
+                  </select>
+                </div>
+                <div className="input-group w-auto shadow-sm">
+                  <span className="input-group-text">
+                    <i className="bi bi-search"></i>
+                  </span>
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="value"
+                    value={searchCustomer.value}
+                    onChange={handleCustomerSearchChange}
+                    placeholder="Tìm kiếm..."
+                  />
+                </div>
               </div>
-              <table className="table table-hover">
-                <thead>
-                  <tr>
-                    <th>Họ và tên</th>
-                    <th>Số điện thoại</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentCustomers.map((c) => (
-                    <tr
-                      key={c.id}
-                      onClick={() => setSelectedCustomerId(c.id)}
-                      className={
-                        selectedCustomerId === c.id ? "table-active" : ""
-                      }
-                    >
-                      <td>{c.fullName}</td>
-                      <td>{c.phone}</td>
+              <div className="table-responsive">
+                <table className="table table-hover table-bordered align-middle ">
+                  <thead className="table-light">
+                    <tr>
+                      <th className="fw-bold text-center">Họ và tên</th>
+                      <th className="fw-bold text-center">Số điện thoại</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-
-              {/* Phân trang sử dụng Ant Design cho khách hàng */}
+                  </thead>
+                  <tbody>
+                    {currentCustomers.map((c) => (
+                      <tr
+                        key={c.id}
+                        onClick={() => setSelectedCustomerId(c.id)}
+                        className={
+                          selectedCustomerId === c.id ? "table-active" : ""
+                        }
+                        style={{ cursor: "pointer" }}
+                      >
+                        <td>{c.fullName}</td>
+                        <td className="text-center">{c.phone}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
               <div className="d-flex justify-content-center mt-4">
                 <Pagination
                   current={currentPageCustomer}
@@ -395,111 +436,130 @@ const SalesManagement = () => {
               </Button>
             </Modal.Footer>
           </Modal>
-          <div className="mb-3">
-            <h6>Sản phẩm</h6>
-            <Button
-              variant="primary"
-              onClick={() => setShowProductModal(true)}
-              className="mb-2"
-            >
-              Chọn sản phẩm
-            </Button>
+
+          {/* Sản phẩm */}
+          <div className="mb-4">
+            <h5 className="fw-bold mb-3">Sản phẩm</h5>
+            <div className="d-flex justify-content-end mb-3">
+              <button
+                className="btn btn-primary fw-bold px-4 py-2 d-flex align-items-center gap-2"
+                onClick={() => setShowProductModal(true)}
+              >
+                <i className="bi bi-cart-plus-fill"></i> Chọn sản phẩm
+              </button>
+            </div>
             {selectedProducts.length > 0 && (
-              <table className="table table-bordered mt-2">
-                <thead>
-                  <tr>
-                    <th>Tên sản phẩm</th>
-                    <th>Giá</th>
-                    <th>Số lượng</th>
-                    <th>Thành tiền</th>
-                    <th>Hành động</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {selectedProducts.map((p) => (
-                    <tr key={p.id}>
-                      <td>{p.name}</td>
-                      <td>{p.price.toLocaleString("vi-VN")} VNĐ</td>
-                      <td>
-                        <input
-                          type="number"
-                          className="form-control"
-                          value={p.selectedQuantity}
-                          onChange={(e) =>
-                            handleQuantityChange(p.id, e.target.value)
-                          }
-                          min="1"
-                          max={p.quantity}
-                        />
-                      </td>
-                      <td>
-                        {(p.price * p.selectedQuantity).toLocaleString("vi-VN")}{" "}
-                        VNĐ
-                      </td>
-                      <td>
-                        <Button
-                          variant="danger"
-                          size="sm"
-                          onClick={() => handleRemoveProduct(p.id)}
-                        >
-                          Xóa
-                        </Button>
-                      </td>
+              <div className="table-responsive">
+                <table className="table table-hover table-bordered align-middle text-center">
+                  <thead className="table-light">
+                    <tr>
+                      <th className="fw-bold">Tên sản phẩm</th>
+                      <th className="fw-bold">Giá</th>
+                      <th className="fw-bold">Số lượng</th>
+                      <th className="fw-bold">Thành tiền</th>
+                      <th className="fw-bold">Hành động</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {selectedProducts.map((p) => (
+                      <tr key={p.id}>
+                        <td>{p.name}</td>
+                        <td>{formatCurrency(p.price)}</td>
+                        <td>
+                          <input
+                            type="number"
+                            className="form-control text-center"
+                            value={p.selectedQuantity}
+                            onChange={(e) =>
+                              handleQuantityChange(p.id, e.target.value)
+                            }
+                            min="1"
+                            max={p.quantity}
+                            style={{ width: "100px", margin: "0 auto" }}
+                          />
+                        </td>
+                        <td>{formatCurrency(p.price * p.selectedQuantity)}</td>
+                        <td>
+                          <button
+                            className="btn btn-danger btn-sm shadow-sm"
+                            onClick={() => handleRemoveProduct(p.id)}
+                          >
+                            <i className="bi bi-trash-fill"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
+
+          {/* Modal chọn sản phẩm */}
           <Modal
             show={showProductModal}
             onHide={() => setShowProductModal(false)}
+            centered
           >
             <Modal.Header closeButton>
               <Modal.Title>Chọn sản phẩm</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <div className="d-flex gap-2 mb-3">
-                <select
-                  className="form-control"
-                  name="type"
-                  value={searchProduct.type}
-                  onChange={handleProductSearchChange}
-                >
-                  <option value="name">Tên</option>
-                  <option value="brand">Hãng</option>
-                </select>
-                <input
-                  type="text"
-                  className="form-control"
-                  name="value"
-                  value={searchProduct.value}
-                  onChange={handleProductSearchChange}
-                  placeholder="Tìm kiếm..."
-                />
+              <div className="d-flex gap-3 mb-4">
+                <div className="input-group w-auto shadow-sm">
+                  <span className="input-group-text">
+                    <i className="bi bi-search"></i>
+                  </span>
+                  <select
+                    className="form-select"
+                    name="type"
+                    value={searchProduct.type}
+                    onChange={handleProductSearchChange}
+                  >
+                    <option value="name">Tên</option>
+                    <option value="brand">Hãng</option>
+                  </select>
+                </div>
+                <div className="input-group w-auto shadow-sm">
+                  <span className="input-group-text">
+                    <i className="bi bi-search"></i>
+                  </span>
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="value"
+                    value={searchProduct.value}
+                    onChange={handleProductSearchChange}
+                    placeholder="Tìm kiếm..."
+                  />
+                </div>
               </div>
-              <table className="table table-hover">
-                <thead>
-                  <tr>
-                    <th>Tên</th>
-                    <th>Hãng</th>
-                    <th>Giá</th>
-                    <th>Số lượng còn lại</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentProducts.map((p) => (
-                    <tr key={p.id} onClick={() => handleSelectProduct(p)}>
-                      <td>{p.name}</td>
-                      <td>{p.brand}</td>
-                      <td>{p.price.toLocaleString("vi-VN")} VNĐ</td>
-                      <td>{p.quantity}</td>
+              <div className="table-responsive">
+                <table className="table table-hover table-bordered align-middle text-center">
+                  <thead className="table-light">
+                    <tr>
+                      <th className="fw-bold">Tên</th>
+                      <th className="fw-bold">Hãng</th>
+                      <th className="fw-bold">Giá</th>
+                      <th className="fw-bold">Số lượng còn lại</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-
-              {/* Phân trang sử dụng Ant Design cho sản phẩm */}
+                  </thead>
+                  <tbody>
+                    {currentProducts.map((p) => (
+                      <tr
+                        key={p.id}
+                        onClick={() => handleSelectProduct(p)}
+                        style={{ cursor: "pointer" }}
+                      >
+                        <td>{p.name}</td>
+                        <td>{p.brand}</td>
+                        <td>{formatCurrency(p.price)}</td>
+                        <td>{p.quantity}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
               <div className="d-flex justify-content-center mt-4">
                 <Pagination
                   current={currentPageProduct}
@@ -519,46 +579,67 @@ const SalesManagement = () => {
               </Button>
             </Modal.Footer>
           </Modal>
-          <div className="mb-3">
-            <h6>Thành tiền: {totalAmount.toLocaleString("vi-VN")} VNĐ</h6>
+
+          {/* Tổng tiền */}
+          <div className="mb-4">
+            <h5 className="fw-bold">
+              Tổng tiền: {formatCurrency(totalAmount)}
+            </h5>
           </div>
-          <div className="mb-3">
-            <h6>Hình thức thanh toán</h6>
-            <div>
-              <input
-                type="radio"
-                id="cash"
-                name="paymentMethod"
-                value="cash"
-                checked={paymentMethod === "cash"}
-                onChange={() => setPaymentMethod("cash")}
-              />
-              <label htmlFor="cash" className="ms-2">
-                Tiền mặt
-              </label>
+
+          {/* Hình thức thanh toán */}
+          <div className="mb-4">
+            <h5 className="fw-bold mb-3">Hình thức thanh toán</h5>
+            <div className="d-flex gap-4">
+              <div className="form-check">
+                <input
+                  type="radio"
+                  id="cash"
+                  name="paymentMethod"
+                  value="cash"
+                  checked={paymentMethod === "cash"}
+                  onChange={() => setPaymentMethod("cash")}
+                  className="form-check-input"
+                />
+                <label htmlFor="cash" className="form-check-label">
+                  Tiền mặt
+                </label>
+              </div>
+              <div className="form-check">
+                <input
+                  type="radio"
+                  id="transfer"
+                  name="paymentMethod"
+                  value="transfer"
+                  checked={paymentMethod === "transfer"}
+                  onChange={() => setPaymentMethod("transfer")}
+                  className="form-check-input"
+                />
+                <label htmlFor="transfer" className="form-check-label">
+                  Chuyển khoản
+                </label>
+              </div>
             </div>
-            <div>
-              <input
-                type="radio"
-                id="transfer"
-                name="paymentMethod"
-                value="transfer"
-                checked={paymentMethod === "transfer"}
-                onChange={() => setPaymentMethod("transfer")}
-              />
-              <label htmlFor="transfer" className="ms-2">
-                Chuyển khoản
-              </label>
-              {paymentMethod === "transfer" && (
-                <div className="mt-2">
-                  <img src={qrCode} alt="QR Code" style={{ width: "150px" }} />
-                </div>
-              )}
-            </div>
+            {paymentMethod === "transfer" && (
+              <div className="mt-3 text-center">
+                <img
+                  src={qrCode}
+                  alt="QR Code"
+                  style={{ width: "150px", borderRadius: "8px" }}
+                />
+              </div>
+            )}
           </div>
-          <Button variant="success" onClick={handlePayment}>
-            Tiến hành thanh toán
-          </Button>
+
+          {/* Nút thanh toán */}
+          <div className="d-flex justify-content-center">
+            <button
+              className="btn btn-success fw-bold px-4 py-2 d-flex align-items-center gap-2"
+              onClick={handlePayment}
+            >
+              <i className="bi bi-credit-card-fill"></i> Tiến hành thanh toán
+            </button>
+          </div>
         </div>
       </div>
 

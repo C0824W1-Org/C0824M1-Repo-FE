@@ -122,174 +122,226 @@ const EditProducts = () => {
   }
 
   return (
-    <div className="content container-fluid p-4">
-      <h2 className="mb-4">Sửa thông tin hàng hóa</h2>
-      <div className="card shadow-sm">
+    <div className="container py-4">
+      <div className="card shadow-lg rounded-3 border-0">
         <div className="card-body">
+          <h4 className="card-title text-center text-primary fw-bold mb-4">
+            Cập nhật hàng hóa
+          </h4>
           <form onSubmit={handleSubmit}>
-            <div className="form-group mb-3">
-              <label>
-                Tên <span className="text-danger">*</span>
-              </label>
-              <input
-                type="text"
-                className="form-control"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-              />
+            <div className="row g-3">
+              {/* Tên */}
+              <div className="col-md-6">
+                <label className="form-label fw-bold">
+                  Tên <span className="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Nhập tên sản phẩm"
+                  required
+                />
+              </div>
+
+              {/* Hãng */}
+              <div className="col-md-6">
+                <label className="form-label fw-bold">Hãng</label>
+                <select
+                  className="form-select"
+                  name="brand"
+                  value={formData.brand}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="Apple">Apple</option>
+                  <option value="Samsung">Samsung</option>
+                  <option value="Oppo">Oppo</option>
+                  <option value="Nokia">Nokia</option>
+                  <option value="Pixel">Pixel</option>
+                  <option value="Vivo">Vivo</option>
+                </select>
+              </div>
+
+              {/* Giá */}
+              <div className="col-md-4">
+                <label className="form-label fw-bold">
+                  Giá (VNĐ) <span className="text-danger">*</span>
+                </label>
+                <input
+                  type="number"
+                  className="form-control"
+                  name="price"
+                  value={formData.price}
+                  onChange={handleChange}
+                  placeholder="Nhập giá"
+                  required
+                />
+              </div>
+
+              {/* Số lượng */}
+              <div className="col-md-4">
+                <label className="form-label fw-bold">
+                  Số lượng <span className="text-danger">*</span>
+                </label>
+                <input
+                  type="number"
+                  className="form-control"
+                  name="quantity"
+                  value={formData.quantity}
+                  onChange={handleChange}
+                  placeholder="Nhập số lượng"
+                  required
+                />
+              </div>
+
+              {/* Màu sắc */}
+              <div className="col-md-4">
+                <label className="form-label fw-bold">Màu sắc</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="color"
+                  value={formData.color}
+                  onChange={handleChange}
+                  placeholder="Nhập màu sắc"
+                />
+              </div>
+
+              {/* CPU */}
+              <div className="col-md-6">
+                <label className="form-label fw-bold">CPU</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="cpu"
+                  value={formData.cpu}
+                  onChange={handleChange}
+                  placeholder="Nhập CPU (ví dụ: A14 Bionic)"
+                />
+              </div>
+
+              {/* Bộ nhớ */}
+              <div className="col-md-6">
+                <label className="form-label fw-bold">Bộ nhớ</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="storage"
+                  value={formData.storage}
+                  onChange={handleChange}
+                  placeholder="Nhập bộ nhớ (ví dụ: 128GB)"
+                />
+              </div>
+
+              {/* Hệ điều hành */}
+              <div className="col-md-6">
+                <label className="form-label fw-bold">Hệ điều hành</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="os"
+                  value={formData.os}
+                  onChange={handleChange}
+                  placeholder="Nhập hệ điều hành (ví dụ: iOS 16)"
+                />
+              </div>
+
+              {/* Pin */}
+              <div className="col-md-6">
+                <label className="form-label fw-bold">Pin</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="battery"
+                  value={formData.battery}
+                  onChange={handleChange}
+                  placeholder="Nhập dung lượng pin (ví dụ: 4000mAh)"
+                />
+              </div>
+
+              {/* Kích thước màn hình */}
+              <div className="col-md-6">
+                <label className="form-label fw-bold">
+                  Kích thước màn hình
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="screenSize"
+                  value={formData.screenSize}
+                  onChange={handleChange}
+                  placeholder="Nhập kích thước (ví dụ: 6.1 inch)"
+                />
+              </div>
+
+              {/* Camera */}
+              <div className="col-md-6">
+                <label className="form-label fw-bold">Camera</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="camera"
+                  value={formData.camera}
+                  onChange={handleChange}
+                  placeholder="Nhập thông số camera (ví dụ: 12MP)"
+                />
+              </div>
+
+              {/* Mô tả */}
+              <div className="col-12">
+                <label className="form-label fw-bold">Mô tả</label>
+                <textarea
+                  className="form-control"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  rows="4"
+                  placeholder="Nhập mô tả sản phẩm"
+                />
+              </div>
+
+              {/* Ảnh sản phẩm */}
+              <div className="col-12">
+                <label className="form-label fw-bold">Ảnh sản phẩm</label>
+                <input
+                  type="file"
+                  className="form-control"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                />
+                {formData.image && (
+                  <div className="mt-3 text-center">
+                    <img
+                      src={formData.image}
+                      alt="Preview"
+                      style={{
+                        maxWidth: "200px",
+                        maxHeight: "200px",
+                        borderRadius: "8px",
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="form-group mb-3">
-              <label>Hãng</label>
-              <select
-                className="form-control"
-                name="brand"
-                value={formData.brand}
-                onChange={handleChange}
-                required
+
+            {/* Nút điều khiển */}
+            <div className="d-flex justify-content-center gap-3 mt-4">
+              <button
+                type="submit"
+                className="btn btn-primary fw-bold px-4 py-2 d-flex align-items-center gap-2"
               >
-                <option value="Apple">Apple</option>
-                <option value="Samsung">Samsung</option>
-                <option value="Oppo">Oppo</option>
-                <option value="Nokia">Nokia</option>
-                <option value="Pixel">Pixel</option>
-                <option value="Vivo">Vivo</option>
-              </select>
-            </div>
-            <div className="form-group mb-3">
-              <label>
-                Giá (VNĐ) <span className="text-danger">*</span>
-              </label>
-              <input
-                type="number"
-                className="form-control"
-                name="price"
-                value={formData.price}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="form-group mb-3">
-              <label>CPU</label>
-              <input
-                type="text"
-                className="form-control"
-                name="cpu"
-                value={formData.cpu}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="form-group mb-3">
-              <label>Bộ nhớ</label>
-              <input
-                type="text"
-                className="form-control"
-                name="storage"
-                value={formData.storage}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="form-group mb-3">
-              <label>Hệ điều hành</label>
-              <input
-                type="text"
-                className="form-control"
-                name="os"
-                value={formData.os}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="form-group mb-3">
-              <label>Pin</label>
-              <input
-                type="text"
-                className="form-control"
-                name="battery"
-                value={formData.battery}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="form-group mb-3">
-              <label>Kích thước màn hình</label>
-              <input
-                type="text"
-                className="form-control"
-                name="screenSize"
-                value={formData.screenSize}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="form-group mb-3">
-              <label>Camera</label>
-              <input
-                type="text"
-                className="form-control"
-                name="camera"
-                value={formData.camera}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="form-group mb-3">
-              <label>Màu sắc</label>
-              <input
-                type="text"
-                className="form-control"
-                name="color"
-                value={formData.color}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="form-group mb-3">
-              <label>
-                Số lượng <span className="text-danger">*</span>
-              </label>
-              <input
-                type="number"
-                className="form-control"
-                name="quantity"
-                value={formData.quantity}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="form-group mb-3">
-              <label>Mô tả</label>
-              <textarea
-                className="form-control"
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="form-group mb-3">
-              <label>Ảnh sản phẩm</label>
-              <input
-                type="file"
-                className="form-control"
-                accept="image/*"
-                onChange={handleImageChange}
-              />
-              {formData.image && (
-                <div className="mt-2">
-                  <img
-                    src={formData.image}
-                    alt="Preview"
-                    style={{ maxWidth: "200px", maxHeight: "200px" }}
-                  />
-                </div>
-              )}
-            </div>
-            <div className="d-flex gap-2">
-              <button type="submit" className="btn btn-primary">
-                Lưu thay đổi
+                <i className="bi bi-check-circle-fill"></i> Cập nhật hàng hóa
               </button>
               <button
                 type="button"
-                className="btn btn-secondary"
+                className="btn btn-secondary fw-bold px-4 py-2 d-flex align-items-center gap-2"
                 onClick={handleCancel}
               >
-                Hủy
+                <i className="bi bi-x-circle-fill"></i> Hủy
               </button>
             </div>
           </form>

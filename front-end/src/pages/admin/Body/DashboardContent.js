@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import ProductsService from "../../../services/Products.service";
 import SalesService from "../../../services/Sales.service";
+import UsersService from "../../../services/Users.service";
+import CustomersService from "../../../services/Customers.service";
+import SuppliersService from "../../../services/Suppliers.service";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
@@ -10,6 +13,9 @@ const DashboardContent = () => {
     totalProducts: 0,
     totalRevenue: 0,
     totalSoldItems: 0,
+    totalStaff: 0,
+    totalCustomers: 0,
+    totalSuppliers: 0,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,25 +25,57 @@ const DashboardContent = () => {
     const fetchDashboardData = async () => {
       try {
         // Lấy danh sách sản phẩm
-        const products = await ProductsService.getAllProducts();
+        const productsResponse = await ProductsService.getAllProducts();
+        const products = Array.isArray(productsResponse)
+          ? productsResponse
+          : [];
         const totalProducts = products.length;
 
         // Lấy danh sách giao dịch
-        const sales = await SalesService.getAllSales();
+        const salesResponse = await SalesService.getAllSales();
+        const sales = Array.isArray(salesResponse) ? salesResponse : [];
         const totalRevenue = sales.reduce(
-          (sum, sale) => sum + sale.totalAmount,
+          (sum, sale) => sum + (sale.totalAmount || 0),
           0
         );
         const totalSoldItems = sales.reduce((sum, sale) => {
           return (
-            sum + sale.products.reduce((subSum, p) => subSum + p.quantity, 0)
+            sum +
+            (sale.products || []).reduce(
+              (subSum, p) => subSum + (p.quantity || 0),
+              0
+            )
           );
         }, 0);
+
+        // Lấy danh sách nhân viên
+        const usersResponse = await UsersService.getAllUsers();
+        const users = Array.isArray(usersResponse) ? usersResponse : [];
+        const totalStaff = users.filter(
+          (user) => user.role !== "customer"
+        ).length;
+
+        // Lấy danh sách khách hàng
+        const customersResponse = await CustomersService.getAllCustomers();
+        const customers = Array.isArray(customersResponse)
+          ? customersResponse
+          : [];
+        const totalCustomers = customers.length;
+
+        // Lấy danh sách nhà cung cấp
+        const suppliersResponse = await SuppliersService.getAllSuppliers();
+        const suppliers = Array.isArray(suppliersResponse)
+          ? suppliersResponse
+          : [];
+        const totalSuppliers = suppliers.length;
 
         setStats({
           totalProducts,
           totalRevenue,
           totalSoldItems,
+          totalStaff,
+          totalCustomers,
+          totalSuppliers,
         });
         setLoading(false);
       } catch (err) {
@@ -63,6 +101,18 @@ const DashboardContent = () => {
     navigate("/admin/revenue-management");
   };
 
+  const handleViewStaff = () => {
+    navigate("/admin/list-members");
+  };
+
+  const handleViewCustomers = () => {
+    navigate("/admin/list-customers");
+  };
+
+  const handleViewSuppliers = () => {
+    navigate("/admin/list-suppliers");
+  };
+
   if (loading) {
     return <div className="text-center py-5">Đang tải dữ liệu thống kê...</div>;
   }
@@ -72,68 +122,195 @@ const DashboardContent = () => {
   }
 
   return (
-    <div className="content container-fluid p-4">
-      <h2 className="mb-4">Trang chủ quản trị</h2>
-      <div className="row g-4">
-        {/* Tổng số sản phẩm */}
-        <div className="col-md-4">
-          <div className="card shadow-sm h-100">
-            <div className="card-body text-center">
-              <h5 className="card-title text-primary">Tổng số sản phẩm</h5>
-              <p className="card-text display-6 mt-5">{stats.totalProducts}</p>
-              <button
-                className="btn btn-outline-primary "
-                onClick={handleViewProducts}
-              >
-                Xem danh sách sản phẩm
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Tổng doanh thu */}
-        <div className="col-md-4">
-          <div className="card shadow-sm h-100">
-            <div className="card-body text-center">
-              <h5 className="card-title text-success">Tổng doanh thu</h5>
-              <p className="card-text display-6 mt-5">
-                {stats.totalRevenue.toLocaleString("vi-VN")} VNĐ
-              </p>
-              <button
-                className="btn btn-outline-success "
-                onClick={handleViewRevenue}
-              >
-                Xem chi tiết doanh thu
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Số lượng sản phẩm đã bán */}
-        <div className="col-md-4">
-          <div className="card shadow-sm h-100">
-            <div className="card-body text-center">
-              <h5 className="card-title text-info">Sản phẩm đã bán</h5>
-              <p className="card-text display-6 mt-5">{stats.totalSoldItems}</p>
-              <button
-                className="btn btn-outline-info "
-                onClick={handleViewSales}
-              >
-                Xem quản lý bán hàng
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Thông tin chào mừng */}
-      <div className="card shadow-sm mt-5">
+    <div className="container py-4">
+      <div className="card shadow-lg rounded-3 border-0">
         <div className="card-body">
-          <h5 className="card-title">Chào mừng đến với Dashboard</h5>
-          <p className="card-text">
-            Đây là trung tâm quản trị của bạn. Từ đây, bạn có thể theo dõi sản
-            phẩm, doanh thu, và các giao dịch bán hàng một cách dễ dàng.
-          </p>
+          <h4 className="card-title text-center text-primary fw-bold mb-4">
+            Trang chủ quản trị
+          </h4>
+          <div className="row g-4">
+            {/* Tổng số sản phẩm */}
+            <div className="col-md-4">
+              <div
+                className="p-4 rounded-3 shadow-sm text-white"
+                style={{
+                  background: "linear-gradient(135deg, #6e8efb, #a777e3)",
+                  transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.transform = "scale(1.05)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.transform = "scale(1)")
+                }
+              >
+                <div className="d-flex align-items-center gap-2 mb-2">
+                  <i className="bi bi-box-fill fs-4"></i>
+                  <h5 className="mb-0">Tổng số sản phẩm</h5>
+                </div>
+                <p className="fw-bold fs-3 mb-3">{stats.totalProducts}</p>
+                <button
+                  className="btn btn-light fw-bold px-4 py-2 d-flex align-items-center gap-2 mx-auto"
+                  onClick={handleViewProducts}
+                >
+                  <i className="bi bi-list-ul"></i> Xem danh sách sản phẩm
+                </button>
+              </div>
+            </div>
+
+            {/* Tổng doanh thu */}
+            <div className="col-md-4">
+              <div
+                className="p-4 rounded-3 shadow-sm text-white"
+                style={{
+                  background: "linear-gradient(135deg, #ff9a9e, #fad0c4)",
+                  transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.transform = "scale(1.05)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.transform = "scale(1)")
+                }
+              >
+                <div className="d-flex align-items-center gap-2 mb-2">
+                  <i className="bi bi-currency-dollar fs-4"></i>
+                  <h5 className="mb-0">Tổng doanh thu</h5>
+                </div>
+                <p className="fw-bold fs-3 mb-3">
+                  {stats.totalRevenue.toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })}
+                </p>
+                <button
+                  className="btn btn-light fw-bold px-4 py-2 d-flex align-items-center gap-2 mx-auto"
+                  onClick={handleViewRevenue}
+                >
+                  <i className="bi bi-bar-chart-fill"></i> Xem chi tiết doanh
+                  thu
+                </button>
+              </div>
+            </div>
+
+            {/* Số lượng sản phẩm đã bán */}
+            <div className="col-md-4">
+              <div
+                className="p-4 rounded-3 shadow-sm text-white"
+                style={{
+                  background: "linear-gradient(135deg, #84fab0, #8fd3f4)",
+                  transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.transform = "scale(1.05)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.transform = "scale(1)")
+                }
+              >
+                <div className="d-flex align-items-center gap-2 mb-2">
+                  <i className="bi bi-cart-check-fill fs-4"></i>
+                  <h5 className="mb-0">Sản phẩm đã bán</h5>
+                </div>
+                <p className="fw-bold fs-3 mb-3">{stats.totalSoldItems}</p>
+                <button
+                  className="btn btn-light fw-bold px-4 py-2 d-flex align-items-center gap-2 mx-auto"
+                  onClick={handleViewSales}
+                >
+                  <i className="bi bi-cart-fill"></i> Xem quản lý bán hàng
+                </button>
+              </div>
+            </div>
+
+            {/* Tổng số nhân viên */}
+            <div className="col-md-4">
+              <div
+                className="p-4 rounded-3 shadow-sm text-white"
+                style={{
+                  background: "linear-gradient(135deg, #f6d365, #fda085)",
+                  transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.transform = "scale(1.05)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.transform = "scale(1)")
+                }
+              >
+                <div className="d-flex align-items-center gap-2 mb-2">
+                  <i className="bi bi-people-fill fs-4"></i>
+                  <h5 className="mb-0">Tổng số nhân viên</h5>
+                </div>
+                <p className="fw-bold fs-3 mb-3">{stats.totalStaff}</p>
+                <button
+                  className="btn btn-light fw-bold px-4 py-2 d-flex align-items-center gap-2 mx-auto"
+                  onClick={handleViewStaff}
+                >
+                  <i className="bi bi-person-lines-fill"></i> Xem danh sách nhân
+                  viên
+                </button>
+              </div>
+            </div>
+
+            {/* Tổng số khách hàng */}
+            <div className="col-md-4">
+              <div
+                className="p-4 rounded-3 shadow-sm text-white"
+                style={{
+                  background: "linear-gradient(135deg, #a1c4fd, #c2e9fb)",
+                  transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.transform = "scale(1.05)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.transform = "scale(1)")
+                }
+              >
+                <div className="d-flex align-items-center gap-2 mb-2">
+                  <i className="bi bi-person-heart fs-4"></i>
+                  <h5 className="mb-0">Tổng số khách hàng</h5>
+                </div>
+                <p className="fw-bold fs-3 mb-3">{stats.totalCustomers}</p>
+                <button
+                  className="btn btn-light fw-bold px-4 py-2 d-flex align-items-center gap-2 mx-auto"
+                  onClick={handleViewCustomers}
+                >
+                  <i className="bi bi-person-lines-fill"></i> Xem danh sách
+                  khách hàng
+                </button>
+              </div>
+            </div>
+
+            {/* Tổng số nhà cung cấp */}
+            <div className="col-md-4">
+              <div
+                className="p-4 rounded-3 shadow-sm text-white"
+                style={{
+                  background: "linear-gradient(135deg, #d4fc79, #96e6a1)",
+                  transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.transform = "scale(1.05)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.transform = "scale(1)")
+                }
+              >
+                <div className="d-flex align-items-center gap-2 mb-2">
+                  <i className="bi bi-truck fs-4"></i>
+                  <h5 className="mb-0">Tổng số nhà cung cấp</h5>
+                </div>
+                <p className="fw-bold fs-3 mb-3">{stats.totalSuppliers}</p>
+                <button
+                  className="btn btn-light fw-bold px-4 py-2 d-flex align-items-center gap-2 mx-auto"
+                  onClick={handleViewSuppliers}
+                >
+                  <i className="bi bi-list-ul"></i> Xem danh sách nhà cung cấp
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

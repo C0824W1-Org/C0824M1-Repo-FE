@@ -92,26 +92,81 @@ const Sidebar = ({ isSidebarOpen, userRole }) => {
   };
 
   return (
-    <div className={`sidebar ${isSidebarOpen ? "open" : "closed"}`}>
-      <div className="sidebar-header">
-        <h3>{isSidebarOpen ? "Admin Panel" : "AP"}</h3>
+    <div
+      className={`sidebar ${isSidebarOpen ? "open" : "closed"} shadow-lg`}
+      style={{
+        background: "linear-gradient(180deg, #2c3e50, #1a252f)",
+        color: "white",
+        height: "100vh",
+        position: "fixed",
+        top: 0,
+        left: 0,
+        transition: "width 0.3s ease",
+        width: isSidebarOpen ? "250px" : "70px",
+        overflowY: "auto",
+        zIndex: 1001,
+      }}
+    >
+      <div
+        className="sidebar-header text-center py-4"
+        style={{
+          borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+        }}
+      >
+        <h3 style={{ margin: 0, fontSize: isSidebarOpen ? "24px" : "18px" }}>
+          {isSidebarOpen ? "Admin Panel" : "AP"}
+        </h3>
       </div>
-      <ul className="nav-list">
+      <ul className="nav-list p-0 m-0">
         {filteredMenuItems.map((item) => (
           <li
             key={item.name}
-            className={`nav-item ${
+            className={`nav-item d-flex align-items-center gap-3 py-3 px-4 ${
               location.pathname === item.path ? "active" : ""
             }`}
             onClick={() => handleNavigation(item.path)}
+            style={{
+              cursor: "pointer",
+              transition: "background 0.3s ease",
+              background:
+                location.pathname === item.path
+                  ? "linear-gradient(90deg, #6e8efb, #a777e3)"
+                  : "transparent",
+            }}
+            onMouseEnter={(e) =>
+              location.pathname !== item.path &&
+              (e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)")
+            }
+            onMouseLeave={(e) =>
+              location.pathname !== item.path &&
+              (e.currentTarget.style.background = "transparent")
+            }
           >
-            <item.icon className="icon" />
-            {isSidebarOpen && <span>{item.label}</span>}
+            <item.icon className="icon" style={{ fontSize: "20px" }} />
+            {isSidebarOpen && (
+              <span style={{ fontSize: "16px" }}>{item.label}</span>
+            )}
           </li>
         ))}
-        <li className="nav-item logout" onClick={() => navigate("/login")}>
-          <FaSignOutAlt className="icon" />
-          {isSidebarOpen && <span>Logout</span>}
+        <li
+          className="nav-item logout d-flex align-items-center gap-3 py-3 px-4"
+          onClick={() => navigate("/login")}
+          style={{
+            cursor: "pointer",
+            transition: "background 0.3s ease",
+            position: "absolute",
+            bottom: "20px",
+            width: "calc(100% - 32px)",
+          }}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)")
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.background = "transparent")
+          }
+        >
+          <FaSignOutAlt className="icon" style={{ fontSize: "20px" }} />
+          {isSidebarOpen && <span style={{ fontSize: "16px" }}>Logout</span>}
         </li>
       </ul>
     </div>

@@ -9,13 +9,13 @@ const EditMembers = () => {
   const [formData, setFormData] = useState({
     username: "",
     password: "",
-    role: "",
+    role: "admin",
     personalInfo: {
       fullName: "",
       dateOfBirth: "",
       address: "",
       phone: "",
-      job: "",
+      job: "Quản trị",
     },
   });
   const [loading, setLoading] = useState(true);
@@ -29,10 +29,16 @@ const EditMembers = () => {
         const member = response.find((user) => user.id === parseInt(memberId));
         if (member) {
           setFormData({
-            username: member.username,
-            password: member.password,
-            role: member.role,
-            personalInfo: { ...member.personalInfo },
+            username: member.username || "",
+            password: member.password || "",
+            role: member.role || "admin",
+            personalInfo: {
+              fullName: member.personalInfo?.fullName || "",
+              dateOfBirth: member.personalInfo?.dateOfBirth || "",
+              address: member.personalInfo?.address || "",
+              phone: member.personalInfo?.phone || "",
+              job: member.personalInfo?.job || "Quản trị",
+            },
           });
         } else {
           setError("Không tìm thấy nhân viên với ID này");
@@ -116,103 +122,158 @@ const EditMembers = () => {
   }
 
   return (
-    <div className="content container-fluid p-4">
-      <h2 className="mb-4">Chỉnh sửa nhân viên</h2>
-      <div className="card shadow-sm">
+    <div className="container py-4">
+      <div className="card shadow-lg rounded-3 border-0">
         <div className="card-body">
+          <h4 className="card-title text-center text-primary fw-bold mb-4">
+            Cập nhật nhân viên
+          </h4>
           <form onSubmit={handleSubmit}>
-            <div className="form-group mb-3">
-              <label>Vai trò</label>
-              <select
-                className="form-control"
-                name="role"
-                value={formData.role}
-                onChange={handleChange}
-                required
+            <div className="row g-3">
+              {/* Tên đăng nhập */}
+              <div className="col-md-6">
+                <label className="form-label fw-bold">
+                  Tên đăng nhập <span className="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  placeholder="Nhập tên đăng nhập"
+                  required
+                />
+              </div>
+
+              {/* Mật khẩu */}
+              <div className="col-md-6">
+                <label className="form-label fw-bold">
+                  Mật khẩu <span className="text-danger">*</span>
+                </label>
+                <input
+                  type="password"
+                  className="form-control"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Nhập mật khẩu"
+                  required
+                />
+              </div>
+
+              {/* Vai trò */}
+              <div className="col-md-6">
+                <label className="form-label fw-bold">Vai trò</label>
+                <select
+                  className="form-select"
+                  name="role"
+                  value={formData.role}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="admin">Admin</option>
+                  <option value="stockkeeper">Thủ kho</option>
+                  <option value="sales">Bán hàng</option>
+                  <option value="business">Kinh doanh</option>
+                </select>
+              </div>
+
+              {/* Họ và tên */}
+              <div className="col-md-6">
+                <label className="form-label fw-bold">
+                  Họ và tên <span className="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="fullName"
+                  value={formData.personalInfo.fullName}
+                  onChange={handleChange}
+                  placeholder="Nhập họ và tên"
+                  required
+                />
+              </div>
+
+              {/* Ngày sinh */}
+              <div className="col-md-6">
+                <label className="form-label fw-bold">
+                  Ngày sinh <span className="text-danger">*</span>
+                </label>
+                <input
+                  type="date"
+                  className="form-control"
+                  name="dateOfBirth"
+                  value={formData.personalInfo.dateOfBirth}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              {/* Số điện thoại */}
+              <div className="col-md-6">
+                <label className="form-label fw-bold">
+                  Số điện thoại <span className="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="phone"
+                  value={formData.personalInfo.phone}
+                  onChange={handleChange}
+                  placeholder="Nhập số điện thoại"
+                  required
+                />
+              </div>
+
+              {/* Địa chỉ */}
+              <div className="col-12">
+                <label className="form-label fw-bold">
+                  Địa chỉ <span className="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="address"
+                  value={formData.personalInfo.address}
+                  onChange={handleChange}
+                  placeholder="Nhập địa chỉ"
+                  required
+                />
+              </div>
+
+              {/* Chức vụ */}
+              <div className="col-md-6">
+                <label className="form-label fw-bold">Chức vụ</label>
+                <select
+                  className="form-select"
+                  name="job"
+                  value={formData.personalInfo.job}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="Quản trị">Quản trị</option>
+                  <option value="Thủ kho">Thủ kho</option>
+                  <option value="Bán hàng">Bán hàng</option>
+                  <option value="Kinh doanh">Kinh doanh</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Nút điều khiển */}
+            <div className="d-flex justify-content-center gap-3 mt-4">
+              <button
+                type="submit"
+                className="btn btn-primary fw-bold px-4 py-2 d-flex align-items-center gap-2"
               >
-                <option value="admin">Admin</option>
-                <option value="stockkeeper">Stockkeeper</option>
-                <option value="sales">Sales</option>
-                <option value="business">Business</option>
-              </select>
-            </div>
-            <div className="form-group mb-3">
-              <label>
-                Họ và tên <span className="text-danger">*</span>
-              </label>
-              <input
-                type="text"
-                className="form-control"
-                name="fullName"
-                value={formData.personalInfo.fullName}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="form-group mb-3">
-              <label>
-                Ngày sinh <span className="text-danger">*</span>
-              </label>
-              <input
-                type="date"
-                className="form-control"
-                name="dateOfBirth"
-                value={formData.personalInfo.dateOfBirth}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="form-group mb-3">
-              <label>
-                Địa chỉ <span className="text-danger">*</span>
-              </label>
-              <input
-                type="text"
-                className="form-control"
-                name="address"
-                value={formData.personalInfo.address}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="form-group mb-3">
-              <label>
-                Số điện thoại <span className="text-danger">*</span>
-              </label>
-              <input
-                type="text"
-                className="form-control"
-                name="phone"
-                value={formData.personalInfo.phone}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="form-group mb-3">
-              <label>Chức vụ</label>
-              <select
-                className="form-control"
-                name="job"
-                value={formData.personalInfo.job}
-                onChange={handleChange}
-                required
-              >
-                <option value="Quản trị">Quản trị</option>
-                <option value="Thủ kho">Thủ kho</option>
-                <option value="Bán hàng">Bán hàng</option>
-                <option value="Kinh doanh">Kinh doanh</option>
-              </select>
-            </div>
-            <div className="d-flex gap-2">
-              <button type="submit" className="btn btn-primary">
-                Lưu thay đổi
+                <i className="bi bi-check-circle-fill"></i> Cập nhật nhân viên
               </button>
               <button
                 type="button"
-                className="btn btn-secondary"
+                className="btn btn-secondary fw-bold px-4 py-2 d-flex align-items-center gap-2"
                 onClick={handleCancel}
               >
-                Hủy
+                <i className="bi bi-x-circle-fill"></i> Hủy
               </button>
             </div>
           </form>

@@ -34,39 +34,50 @@ const MasterAdmin = () => {
   };
 
   return (
-    <div className="admin-dashboard">
+    <div className="admin-dashboard d-flex">
       <Sidebar isSidebarOpen={isSidebarOpen} userRole={userRole} />
-      <div className="main-content">
+      <div
+        className="main-content"
+        style={{
+          marginLeft: isSidebarOpen ? "250px" : "70px",
+          transition: "margin-left 0.3s ease",
+          width: "100%",
+          backgroundColor: "#f5f7fa",
+          minHeight: "100vh",
+        }}
+      >
         <Header toggleSidebar={toggleSidebar} />
-        <Routes>
-          <Route path="/" element={<DashboardContent />} />
-          <Route path="dashboard" element={<DashboardContent />} />
-          <Route path="views-profile" element={<ViewsProfile />} />
-          <Route path="edit-profile" element={<EditProfile />} />
-          <Route path="list-products" element={<ListProducts />} />
-          <Route path="add-products" element={<AddProducts />} />
-          <Route path="edit-products/:productId" element={<EditProducts />} />
-          <Route path="list-suppliers" element={<ListSuppliers />} />
-          <Route path="add-suppliers" element={<AddSuppliers />} />
-          <Route
-            path="edit-suppliers/:supplierId"
-            element={<EditSuppliers />}
-          />
-          <Route path="sales-management" element={<SalesManagement />} />
-          <Route path="revenue-management" element={<RevenueManagement />} />
-          <Route path="edit-sale/:saleId" element={<EditSale />} />
-          <Route path="list-members" element={<ListMembers />} />
-          <Route path="add-members" element={<AddMembers />} />
-          <Route path="edit-members/:memberId" element={<EditMembers />} />
-          <Route path="list-customers" element={<ListCustomers />} />
-          <Route path="add-customers" element={<AddCustomers />} />
-          <Route
-            path="edit-customers/:customerId"
-            element={<EditCustomers />}
-          />
-          <Route path="settings" element={<Account />} />{" "}
-          <Route path="edit-account" element={<EditAccount />} />{" "}
-        </Routes>
+        <div className="content">
+          <Routes>
+            <Route path="/" element={<DashboardContent />} />
+            <Route path="dashboard" element={<DashboardContent />} />
+            <Route path="views-profile" element={<ViewsProfile />} />
+            <Route path="edit-profile" element={<EditProfile />} />
+            <Route path="list-products" element={<ListProducts />} />
+            <Route path="add-products" element={<AddProducts />} />
+            <Route path="edit-products/:productId" element={<EditProducts />} />
+            <Route path="list-suppliers" element={<ListSuppliers />} />
+            <Route path="add-suppliers" element={<AddSuppliers />} />
+            <Route
+              path="edit-suppliers/:supplierId"
+              element={<EditSuppliers />}
+            />
+            <Route path="sales-management" element={<SalesManagement />} />
+            <Route path="revenue-management" element={<RevenueManagement />} />
+            <Route path="edit-sale/:saleId" element={<EditSale />} />
+            <Route path="list-members" element={<ListMembers />} />
+            <Route path="add-members" element={<AddMembers />} />
+            <Route path="edit-members/:memberId" element={<EditMembers />} />
+            <Route path="list-customers" element={<ListCustomers />} />
+            <Route path="add-customers" element={<AddCustomers />} />
+            <Route
+              path="edit-customers/:customerId"
+              element={<EditCustomers />}
+            />
+            <Route path="settings" element={<Account />} />
+            <Route path="edit-account" element={<EditAccount />} />
+          </Routes>
+        </div>
       </div>
     </div>
   );

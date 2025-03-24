@@ -258,7 +258,7 @@ const ListProducts = () => {
             </div>
           </div>
           <div className="table-responsive">
-            <table className="table table-hover table-bordered align-middle text-center">
+            <table className="table table-hover table-bordered align-middle ">
               <thead className="table-light">
                 <tr>
                   <th className="fw-bold text-center">

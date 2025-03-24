@@ -200,98 +200,100 @@ const RevenueManagement = () => {
   }
 
   return (
-    <div className="content container-fluid p-4">
-      <h2 className="mb-4">Quản lý doanh thu</h2>
-      <div className="card shadow-sm">
+    <div className="container py-4">
+      <div className="card shadow-lg rounded-3 border-0">
         <div className="card-body">
-          <h5 className="card-title">Danh sách giao dịch</h5>
+          <h4 className="card-title text-center text-primary fw-bold mb-4">
+            Quản lý doanh thu
+          </h4>
+          <h5 className="fw-bold mb-3">Danh sách giao dịch</h5>
           {sales.length === 0 ? (
             <p className="text-center">Không có giao dịch nào để hiển thị.</p>
           ) : (
             <>
               {selectedSales.length > 0 && (
-                <Button
-                  variant="danger"
-                  className="mb-3"
+                <button
+                  className="btn btn-danger fw-bold px-4 py-2 mb-3 d-flex align-items-center gap-2"
                   onClick={() => setShowBulkDeleteModal(true)}
                 >
-                  Xóa {selectedSales.length} giao dịch
-                </Button>
+                  <i className="bi bi-trash-fill"></i> Xóa{" "}
+                  {selectedSales.length} giao dịch
+                </button>
               )}
-              <table className="table table-bordered table-hover">
-                <thead>
-                  <tr>
-                    <th>
-                      <input
-                        type="checkbox"
-                        checked={allSelectedOnPage}
-                        onChange={handleSelectAll}
-                      />
-                    </th>
-                    <th className="fw-bold">Họ và tên</th>
-                    <th className="fw-bold">Số điện thoại</th>
-                    <th className="fw-bold">Sản phẩm</th>
-                    <th className="fw-bold">Giá</th>
-                    <th className="fw-bold text-center">Số lượng</th>
-                    <th className="fw-bold">Tổng tiền</th>
-                    <th className="fw-bold">Ngày giao dịch</th>
-                    <th className="fw-bold">Hành động</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentSales.map((sale) => (
-                    <tr key={sale.id}>
-                      <td>
+              <div className="table-responsive">
+                <table className="table table-hover table-bordered align-middle text-center">
+                  <thead className="table-light">
+                    <tr>
+                      <th>
                         <input
                           type="checkbox"
-                          checked={selectedSales.includes(sale.id)}
-                          onChange={() => handleSelectSale(sale.id)}
+                          checked={allSelectedOnPage}
+                          onChange={handleSelectAll}
                         />
-                      </td>
-                      <td>{sale.customer.fullName}</td>
-                      <td>{sale.customer.phone}</td>
-                      <td>
-                        {sale.products && Array.isArray(sale.products)
-                          ? sale.products.map((p) => p.name).join(", ")
-                          : "Không có sản phẩm"}
-                      </td>
-                      <td>
-                        {sale.products && Array.isArray(sale.products)
-                          ? sale.products
-                              .map(
-                                (p) => `${p.price.toLocaleString("vi-VN")} VNĐ`
-                              )
-                              .join(", ")
-                          : "N/A"}
-                      </td>
-                      <td className="text-center">
-                        {sale.products && Array.isArray(sale.products)
-                          ? sale.products.map((p) => p.quantity).join(", ")
-                          : "N/A"}
-                      </td>
-                      <td>{sale.totalAmount.toLocaleString("vi-VN")} VNĐ</td>
-                      <td>{new Date(sale.date).toLocaleString("vi-VN")}</td>
-                      <td>
-                        <Button
-                          variant="warning"
-                          size="sm"
-                          className="me-2"
-                          onClick={() => handleEditClick(sale.id)}
-                        >
-                          Sửa
-                        </Button>
-                        <Button
-                          variant="danger"
-                          size="sm"
-                          onClick={() => handleDeleteClick(sale)}
-                        >
-                          Xóa
-                        </Button>
-                      </td>
+                      </th>
+                      <th className="fw-bold">Họ và tên</th>
+                      <th className="fw-bold">Số điện thoại</th>
+                      <th className="fw-bold">Sản phẩm</th>
+                      <th className="fw-bold">Giá</th>
+                      <th className="fw-bold">Số lượng</th>
+                      <th className="fw-bold">Tổng tiền</th>
+                      <th className="fw-bold">Ngày giao dịch</th>
+                      <th className="fw-bold">Hành động</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {currentSales.map((sale) => (
+                      <tr key={sale.id}>
+                        <td>
+                          <input
+                            type="checkbox"
+                            checked={selectedSales.includes(sale.id)}
+                            onChange={() => handleSelectSale(sale.id)}
+                          />
+                        </td>
+                        <td>{sale.customer.fullName}</td>
+                        <td>{sale.customer.phone}</td>
+                        <td>
+                          {sale.products && Array.isArray(sale.products)
+                            ? sale.products.map((p) => p.name).join(", ")
+                            : "Không có sản phẩm"}
+                        </td>
+                        <td>
+                          {sale.products && Array.isArray(sale.products)
+                            ? sale.products
+                                .map(
+                                  (p) =>
+                                    `${p.price.toLocaleString("vi-VN")} VNĐ`
+                                )
+                                .join(", ")
+                            : "N/A"}
+                        </td>
+                        <td>
+                          {sale.products && Array.isArray(sale.products)
+                            ? sale.products.map((p) => p.quantity).join(", ")
+                            : "N/A"}
+                        </td>
+                        <td>{sale.totalAmount.toLocaleString("vi-VN")} VNĐ</td>
+                        <td>{new Date(sale.date).toLocaleString("vi-VN")}</td>
+                        <td>
+                          <button
+                            className="btn btn-warning btn-sm shadow-sm me-2"
+                            onClick={() => handleEditClick(sale.id)}
+                          >
+                            <i className="bi bi-pencil-fill"></i>
+                          </button>
+                          <button
+                            className="btn btn-danger btn-sm shadow-sm"
+                            onClick={() => handleDeleteClick(sale)}
+                          >
+                            <i className="bi bi-trash-fill"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
               <div className="d-flex justify-content-center mt-4">
                 <Pagination
                   current={currentPage}
@@ -303,57 +305,140 @@ const RevenueManagement = () => {
               </div>
             </>
           )}
-          <Button
-            variant="secondary"
-            className="mt-3"
-            onClick={handleBackToSales}
-          >
-            Quay lại Quản lý bán hàng
-          </Button>
+          <div className="d-flex justify-content-center mt-4">
+            <button
+              className="btn btn-secondary fw-bold px-4 py-2 d-flex align-items-center gap-2"
+              onClick={handleBackToSales}
+            >
+              <i className="bi bi-arrow-left-circle-fill"></i> Quay lại Quản lý
+              bán hàng
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Card thống kê doanh thu */}
-      <div className="card shadow-sm mt-4">
+      <div className="card shadow-lg rounded-3 border-0 mt-4">
         <div className="card-body">
-          <h5 className="card-title">Thống kê doanh thu</h5>
-          <div className="row g-3">
+          <h5 className="fw-bold mb-4">Thống kê doanh thu</h5>
+          <div className="row g-4">
             <div className="col-md-3">
-              <div className="p-3 bg-light rounded">
-                <h6>Doanh thu hôm nay</h6>
-                <p className="fw-bold fs-5">
-                  {revenueStats.dailyRevenue.toLocaleString("vi-VN")} VNĐ
-                </p>
-              </div>
-            </div>
-            <div className="col-md-3">
-              <div className="p-3 bg-light rounded">
-                <h6>Doanh thu tháng này</h6>
-                <p className="fw-bold fs-5">
-                  {revenueStats.monthlyRevenue.toLocaleString("vi-VN")} VNĐ
-                </p>
-              </div>
-            </div>
-            <div className="col-md-3">
-              <div className="p-3 bg-light rounded">
-                <h6>Doanh thu năm nay</h6>
-                <p className="fw-bold fs-5">
-                  {revenueStats.yearlyRevenue.toLocaleString("vi-VN")} VNĐ
+              <div
+                className="p-3 rounded-3 shadow-sm text-white d-flex flex-column justify-content-between"
+                style={{
+                  background: "linear-gradient(135deg, #6e8efb, #a777e3)",
+                  transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                  height: "120px", // Chiều cao cố định
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.transform = "scale(1.05)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.transform = "scale(1)")
+                }
+              >
+                <div className="d-flex align-items-center gap-2">
+                  <i className="bi bi-sun-fill fs-4"></i>
+                  <h6 className="mb-0">Doanh thu hôm nay</h6>
+                </div>
+                <p className="fw-bold fs-4 mb-0">
+                  {revenueStats.dailyRevenue.toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })}
                 </p>
               </div>
             </div>
             <div className="col-md-3">
               <div
-                className="p-3 bg-light rounded cursor-pointer"
+                className="p-3 rounded-3 shadow-sm text-white d-flex flex-column justify-content-between"
+                style={{
+                  background: "linear-gradient(135deg, #ff9a9e, #fad0c4)",
+                  transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                  height: "120px", // Chiều cao cố định
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.transform = "scale(1.05)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.transform = "scale(1)")
+                }
+              >
+                <div className="d-flex align-items-center gap-2">
+                  <i className="bi bi-calendar-month-fill fs-4"></i>
+                  <h6 className="mb-0">Doanh thu tháng này</h6>
+                </div>
+                <p className="fw-bold fs-4 mb-0">
+                  {revenueStats.monthlyRevenue.toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })}
+                </p>
+              </div>
+            </div>
+            <div className="col-md-3">
+              <div
+                className="p-3 rounded-3 shadow-sm text-white d-flex flex-column justify-content-between"
+                style={{
+                  background: "linear-gradient(135deg, #84fab0, #8fd3f4)",
+                  transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                  height: "120px", // Chiều cao cố định
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.transform = "scale(1.05)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.transform = "scale(1)")
+                }
+              >
+                <div className="d-flex align-items-center gap-2">
+                  <i className="bi bi-calendar-fill fs-4"></i>
+                  <h6 className="mb-0">Doanh thu năm nay</h6>
+                </div>
+                <p className="fw-bold fs-4 mb-0">
+                  {revenueStats.yearlyRevenue.toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })}
+                </p>
+              </div>
+            </div>
+            <div className="col-md-3">
+              <div
+                className="p-3 rounded-3 shadow-sm text-white d-flex flex-column justify-content-between cursor-pointer position-relative"
+                style={{
+                  background: "linear-gradient(135deg, #f6d365, #fda085)",
+                  transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                  height: "120px", // Chiều cao cố định
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.transform = "scale(1.05)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.transform = "scale(1)")
+                }
                 onClick={() => setShowCustomRangeModal(true)}
               >
-                <h6>Doanh thu tùy chỉnh</h6>
-                <p className="fw-bold fs-5">
-                  {customRevenue.toLocaleString("vi-VN")} VNĐ
+                <div className="d-flex align-items-center gap-2">
+                  <i className="bi bi-clock-fill fs-4"></i>
+                  <h6 className="mb-0">Doanh thu tùy chỉnh</h6>
+                </div>
+                <p className="fw-bold fs-4 mb-0">
+                  {customRevenue.toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })}
                 </p>
-                <small className="text-muted">
-                  Nhấn để chọn khoảng thời gian
-                </small>
+                <i
+                  className="bi bi-info-circle-fill position-absolute"
+                  style={{
+                    top: "10px",
+                    right: "10px",
+                    fontSize: "1rem",
+                    opacity: 0.75,
+                  }}
+                  title="Nhấn để chọn khoảng thời gian"
+                ></i>
               </div>
             </div>
           </div>
@@ -361,7 +446,11 @@ const RevenueManagement = () => {
       </div>
 
       {/* Modal xác nhận xóa đơn */}
-      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+      <Modal
+        show={showDeleteModal}
+        onHide={() => setShowDeleteModal(false)}
+        centered
+      >
         <Modal.Header closeButton>
           <Modal.Title>Xác nhận xóa giao dịch</Modal.Title>
         </Modal.Header>
@@ -383,6 +472,7 @@ const RevenueManagement = () => {
       <Modal
         show={showBulkDeleteModal}
         onHide={() => setShowBulkDeleteModal(false)}
+        centered
       >
         <Modal.Header closeButton>
           <Modal.Title>Xác nhận xóa nhiều giao dịch</Modal.Title>
@@ -408,6 +498,7 @@ const RevenueManagement = () => {
       <Modal
         show={showCustomRangeModal}
         onHide={() => setShowCustomRangeModal(false)}
+        centered
       >
         <Modal.Header closeButton>
           <Modal.Title>Chọn khoảng thời gian</Modal.Title>
@@ -415,7 +506,7 @@ const RevenueManagement = () => {
         <Modal.Body>
           <Form>
             <Form.Group className="mb-3">
-              <Form.Label>Từ ngày</Form.Label>
+              <Form.Label className="fw-bold">Từ ngày</Form.Label>
               <Form.Control
                 type="date"
                 name="startDate"
@@ -425,7 +516,7 @@ const RevenueManagement = () => {
               />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Đến ngày</Form.Label>
+              <Form.Label className="fw-bold">Đến ngày</Form.Label>
               <Form.Control
                 type="date"
                 name="endDate"

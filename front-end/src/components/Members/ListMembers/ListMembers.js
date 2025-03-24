@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { Modal, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { Pagination } from "antd";
+import { FaEdit, FaTrash } from "react-icons/fa";
 
 const ListMembers = () => {
   const navigate = useNavigate();
@@ -238,14 +239,14 @@ const ListMembers = () => {
               className="btn btn-primary fw-bold px-4 py-2 d-flex align-items-center gap-2"
               onClick={handleAdd}
             >
-              <i className="bi bi-person-plus-fill me-2"></i>Thêm nhân viên
+              <i className="bi bi-person-plus-fill"></i> Thêm nhân viên
             </button>
             {selectedMembers.length > 0 && (
               <button
                 className="btn btn-danger fw-bold px-4 py-2 d-flex align-items-center gap-2"
                 onClick={handleShowBulkDeleteModal}
               >
-                <i className="bi bi-trash-fill me-2"></i>Xóa{" "}
+                <i className="bi bi-trash-fill"></i> Xóa{" "}
                 {selectedMembers.length} nhân viên
               </button>
             )}
@@ -294,7 +295,7 @@ const ListMembers = () => {
             </div>
           </div>
           <div className="table-responsive">
-            <table className="table table-hover table-bordered align-middle text-center">
+            <table className="table table-hover table-bordered align-middle ">
               <thead className="table-light">
                 <tr>
                   <th className="fw-bold text-center">
@@ -332,13 +333,13 @@ const ListMembers = () => {
                         className="btn btn-warning btn-sm me-2 shadow-sm"
                         onClick={() => handleEdit(member.id)}
                       >
-                        <i className="bi bi-pencil-fill"></i>
+                        <FaEdit />
                       </button>
                       <button
                         className="btn btn-danger btn-sm shadow-sm"
                         onClick={() => handleDeleteClick(member.id)}
                       >
-                        <i className="bi bi-trash-fill"></i>
+                        <FaTrash />
                       </button>
                     </td>
                   </tr>

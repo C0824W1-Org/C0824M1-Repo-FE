@@ -244,7 +244,7 @@ const ListCustomers = () => {
             </div>
           </div>
           <div className="table-responsive">
-            <table className="table table-hover table-bordered align-middle text-center">
+            <table className="table table-hover table-bordered align-middle">
               <thead className="table-light">
                 <tr>
                   <th className="fw-bold text-center">
@@ -257,7 +257,7 @@ const ListCustomers = () => {
                   <th className="fw-bold">Họ và tên</th>
                   <th className="fw-bold">Số điện thoại</th>
                   <th className="fw-bold">Địa chỉ</th>
-                  <th className="fw-bold">Tuổi</th>
+                  <th className="fw-bold text-center">Tuổi</th>
                   <th className="fw-bold">Email</th>
                   <th className="fw-bold text-center">Hành động</th>
                 </tr>
@@ -275,7 +275,7 @@ const ListCustomers = () => {
                     <td>{customer.fullName}</td>
                     <td>{customer.phone}</td>
                     <td>{customer.address}</td>
-                    <td>{customer.age}</td>
+                    <td className="text-center">{customer.age}</td>
                     <td>{customer.email || "-"}</td>
                     <td className="text-center">
                       <button

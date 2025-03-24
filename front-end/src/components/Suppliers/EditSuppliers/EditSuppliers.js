@@ -24,11 +24,11 @@ const EditSuppliers = () => {
         const supplier = response.find((s) => s.id === parseInt(supplierId));
         if (supplier) {
           setFormData({
-            supplierCode: supplier.supplierCode,
-            name: supplier.name,
-            address: supplier.address,
-            phone: supplier.phone,
-            email: supplier.email,
+            supplierCode: supplier.supplierCode || "",
+            name: supplier.name || "",
+            address: supplier.address || "",
+            phone: supplier.phone || "",
+            email: supplier.email || "",
           });
         } else {
           setError("Không tìm thấy nhà cung cấp với ID này");
@@ -102,86 +102,110 @@ const EditSuppliers = () => {
   }
 
   return (
-    <div className="content container-fluid p-4">
-      <h2 className="mb-4">Sửa thông tin nhà cung cấp</h2>
-      <div className="card shadow-sm">
+    <div className="container py-4">
+      <div className="card shadow-lg rounded-3 border-0">
         <div className="card-body">
+          <h4 className="card-title text-center text-primary fw-bold mb-4">
+            Cập nhật nhà cung cấp
+          </h4>
           <form onSubmit={handleSubmit}>
-            <div className="form-group mb-3">
-              <label>
-                Mã nhà cung cấp <span className="text-danger">*</span>
-              </label>
-              <input
-                type="text"
-                className="form-control"
-                name="supplierCode"
-                value={formData.supplierCode}
-                onChange={handleChange}
-                required
-              />
+            <div className="row g-3">
+              {/* Mã nhà cung cấp */}
+              <div className="col-md-6">
+                <label className="form-label fw-bold">
+                  Mã nhà cung cấp <span className="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="supplierCode"
+                  value={formData.supplierCode}
+                  onChange={handleChange}
+                  placeholder="Nhập mã nhà cung cấp (ví dụ: NCC001)"
+                  required
+                />
+              </div>
+
+              {/* Tên */}
+              <div className="col-md-6">
+                <label className="form-label fw-bold">
+                  Tên <span className="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Nhập tên nhà cung cấp"
+                  required
+                />
+              </div>
+
+              {/* Số điện thoại */}
+              <div className="col-md-6">
+                <label className="form-label fw-bold">
+                  Số điện thoại <span className="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  placeholder="Nhập số điện thoại"
+                  required
+                />
+              </div>
+
+              {/* Email */}
+              <div className="col-md-6">
+                <label className="form-label fw-bold">
+                  Email <span className="text-danger">*</span>
+                </label>
+                <input
+                  type="email"
+                  className="form-control"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="Nhập email (ví dụ: contact@company.com)"
+                  required
+                />
+              </div>
+
+              {/* Địa chỉ */}
+              <div className="col-12">
+                <label className="form-label fw-bold">
+                  Địa chỉ <span className="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleChange}
+                  placeholder="Nhập địa chỉ"
+                  required
+                />
+              </div>
             </div>
-            <div className="form-group mb-3">
-              <label>
-                Tên <span className="text-danger">*</span>
-              </label>
-              <input
-                type="text"
-                className="form-control"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="form-group mb-3">
-              <label>
-                Địa chỉ <span className="text-danger">*</span>
-              </label>
-              <input
-                type="text"
-                className="form-control"
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="form-group mb-3">
-              <label>
-                Số điện thoại <span className="text-danger">*</span>
-              </label>
-              <input
-                type="text"
-                className="form-control"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="form-group mb-3">
-              <label>
-                Email <span className="text-danger">*</span>
-              </label>
-              <input
-                type="email"
-                className="form-control"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="d-flex gap-2">
-              <button type="submit" className="btn btn-primary">
-                Lưu thay đổi
+
+            {/* Nút điều khiển */}
+            <div className="d-flex justify-content-center gap-3 mt-4">
+              <button
+                type="submit"
+                className="btn btn-primary fw-bold px-4 py-2 d-flex align-items-center gap-2"
+              >
+                <i className="bi bi-check-circle-fill"></i> Cập nhật nhà cung
+                cấp
               </button>
               <button
                 type="button"
-                className="btn btn-secondary"
+                className="btn btn-secondary fw-bold px-4 py-2 d-flex align-items-center gap-2"
                 onClick={handleCancel}
               >
-                Hủy
+                <i className="bi bi-x-circle-fill"></i> Hủy
               </button>
             </div>
           </form>
