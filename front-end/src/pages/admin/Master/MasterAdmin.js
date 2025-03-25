@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Sidebar from "../Sidebar/Sidebar";
 import Header from "../Header/Header";
@@ -25,6 +25,14 @@ import "../../assets/css/MasterAdmin.css";
 import Account from "../../../components/Settings/Account/Account";
 import EditAccount from "../../../components/Settings/Account/EditAccount";
 
+// Component bảo vệ route
+const ProtectedRoute = ({ element: Component, allowedRoles, userRole }) => {
+  if (!allowedRoles.includes(userRole)) {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+  return <Component />;
+};
+
 const MasterAdmin = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const userRole = useSelector((state) => state.auth.userLogin.role);
@@ -49,33 +57,216 @@ const MasterAdmin = () => {
         <Header toggleSidebar={toggleSidebar} />
         <div className="content">
           <Routes>
-            <Route path="/" element={<DashboardContent />} />
-            <Route path="dashboard" element={<DashboardContent />} />
-            <Route path="views-profile" element={<ViewsProfile />} />
-            <Route path="edit-profile" element={<EditProfile />} />
-            <Route path="list-products" element={<ListProducts />} />
-            <Route path="add-products" element={<AddProducts />} />
-            <Route path="edit-products/:productId" element={<EditProducts />} />
-            <Route path="list-suppliers" element={<ListSuppliers />} />
-            <Route path="add-suppliers" element={<AddSuppliers />} />
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute
+                  element={DashboardContent}
+                  allowedRoles={["admin", "stockkeeper", "sales", "business"]}
+                  userRole={userRole}
+                />
+              }
+            />
+            <Route
+              path="dashboard"
+              element={
+                <ProtectedRoute
+                  element={DashboardContent}
+                  allowedRoles={["admin", "stockkeeper", "sales", "business"]}
+                  userRole={userRole}
+                />
+              }
+            />
+            <Route
+              path="views-profile"
+              element={
+                <ProtectedRoute
+                  element={ViewsProfile}
+                  allowedRoles={["admin", "stockkeeper", "sales", "business"]}
+                  userRole={userRole}
+                />
+              }
+            />
+            <Route
+              path="edit-profile"
+              element={
+                <ProtectedRoute
+                  element={EditProfile}
+                  allowedRoles={["admin", "stockkeeper", "sales", "business"]}
+                  userRole={userRole}
+                />
+              }
+            />
+            <Route
+              path="list-products"
+              element={
+                <ProtectedRoute
+                  element={ListProducts}
+                  allowedRoles={["admin", "business", "stockkeeper"]}
+                  userRole={userRole}
+                />
+              }
+            />
+            <Route
+              path="add-products"
+              element={
+                <ProtectedRoute
+                  element={AddProducts}
+                  allowedRoles={["admin", "business", "stockkeeper"]}
+                  userRole={userRole}
+                />
+              }
+            />
+            <Route
+              path="edit-products/:productId"
+              element={
+                <ProtectedRoute
+                  element={EditProducts}
+                  allowedRoles={["admin", "business", "stockkeeper"]}
+                  userRole={userRole}
+                />
+              }
+            />
+            <Route
+              path="list-suppliers"
+              element={
+                <ProtectedRoute
+                  element={ListSuppliers}
+                  allowedRoles={["admin", "stockkeeper"]}
+                  userRole={userRole}
+                />
+              }
+            />
+            <Route
+              path="add-suppliers"
+              element={
+                <ProtectedRoute
+                  element={AddSuppliers}
+                  allowedRoles={["admin", "stockkeeper"]}
+                  userRole={userRole}
+                />
+              }
+            />
             <Route
               path="edit-suppliers/:supplierId"
-              element={<EditSuppliers />}
+              element={
+                <ProtectedRoute
+                  element={EditSuppliers}
+                  allowedRoles={["admin", "stockkeeper"]}
+                  userRole={userRole}
+                />
+              }
             />
-            <Route path="sales-management" element={<SalesManagement />} />
-            <Route path="revenue-management" element={<RevenueManagement />} />
-            <Route path="edit-sale/:saleId" element={<EditSale />} />
-            <Route path="list-members" element={<ListMembers />} />
-            <Route path="add-members" element={<AddMembers />} />
-            <Route path="edit-members/:memberId" element={<EditMembers />} />
-            <Route path="list-customers" element={<ListCustomers />} />
-            <Route path="add-customers" element={<AddCustomers />} />
+            <Route
+              path="sales-management"
+              element={
+                <ProtectedRoute
+                  element={SalesManagement}
+                  allowedRoles={["admin", "sales", "business"]}
+                  userRole={userRole}
+                />
+              }
+            />
+            <Route
+              path="revenue-management"
+              element={
+                <ProtectedRoute
+                  element={RevenueManagement}
+                  allowedRoles={["admin", "business"]}
+                  userRole={userRole}
+                />
+              }
+            />
+            <Route
+              path="edit-sale/:saleId"
+              element={
+                <ProtectedRoute
+                  element={EditSale}
+                  allowedRoles={["admin", "sales", "business"]}
+                  userRole={userRole}
+                />
+              }
+            />
+            <Route
+              path="list-members"
+              element={
+                <ProtectedRoute
+                  element={ListMembers}
+                  allowedRoles={["admin"]}
+                  userRole={userRole}
+                />
+              }
+            />
+            <Route
+              path="add-members"
+              element={
+                <ProtectedRoute
+                  element={AddMembers}
+                  allowedRoles={["admin"]}
+                  userRole={userRole}
+                />
+              }
+            />
+            <Route
+              path="edit-members/:memberId"
+              element={
+                <ProtectedRoute
+                  element={EditMembers}
+                  allowedRoles={["admin"]}
+                  userRole={userRole}
+                />
+              }
+            />
+            <Route
+              path="list-customers"
+              element={
+                <ProtectedRoute
+                  element={ListCustomers}
+                  allowedRoles={["admin"]}
+                  userRole={userRole}
+                />
+              }
+            />
+            <Route
+              path="add-customers"
+              element={
+                <ProtectedRoute
+                  element={AddCustomers}
+                  allowedRoles={["admin"]}
+                  userRole={userRole}
+                />
+              }
+            />
             <Route
               path="edit-customers/:customerId"
-              element={<EditCustomers />}
+              element={
+                <ProtectedRoute
+                  element={EditCustomers}
+                  allowedRoles={["admin"]}
+                  userRole={userRole}
+                />
+              }
             />
-            <Route path="settings" element={<Account />} />
-            <Route path="edit-account" element={<EditAccount />} />
+            <Route
+              path="settings"
+              element={
+                <ProtectedRoute
+                  element={Account}
+                  allowedRoles={["admin", "stockkeeper", "sales", "business"]}
+                  userRole={userRole}
+                />
+              }
+            />
+            <Route
+              path="edit-account"
+              element={
+                <ProtectedRoute
+                  element={EditAccount}
+                  allowedRoles={["admin", "stockkeeper", "sales", "business"]}
+                  userRole={userRole}
+                />
+              }
+            />
           </Routes>
         </div>
       </div>

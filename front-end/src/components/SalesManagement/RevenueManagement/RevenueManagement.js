@@ -221,7 +221,7 @@ const RevenueManagement = () => {
                 </button>
               )}
               <div className="table-responsive">
-                <table className="table table-hover table-bordered align-middle text-center">
+                <table className="table table-hover table-bordered align-middle">
                   <thead className="table-light">
                     <tr>
                       <th>
@@ -235,7 +235,7 @@ const RevenueManagement = () => {
                       <th className="fw-bold">Số điện thoại</th>
                       <th className="fw-bold">Sản phẩm</th>
                       <th className="fw-bold">Giá</th>
-                      <th className="fw-bold">Số lượng</th>
+                      <th className="fw-bold text-center">Số lượng</th>
                       <th className="fw-bold">Tổng tiền</th>
                       <th className="fw-bold">Ngày giao dịch</th>
                       <th className="fw-bold">Hành động</th>
@@ -268,7 +268,7 @@ const RevenueManagement = () => {
                                 .join(", ")
                             : "N/A"}
                         </td>
-                        <td>
+                        <td className="text-center">
                           {sale.products && Array.isArray(sale.products)
                             ? sale.products.map((p) => p.quantity).join(", ")
                             : "N/A"}

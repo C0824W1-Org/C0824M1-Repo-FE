@@ -6,9 +6,11 @@ import CustomersService from "../../../services/Customers.service";
 import SuppliersService from "../../../services/Suppliers.service";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const DashboardContent = () => {
   const navigate = useNavigate();
+  const userRole = useSelector((state) => state.auth.userLogin.role);
   const [stats, setStats] = useState({
     totalProducts: 0,
     totalRevenue: 0,
@@ -88,29 +90,53 @@ const DashboardContent = () => {
     fetchDashboardData();
   }, []);
 
-  // Điều hướng đến các trang liên quan
+  // Điều hướng đến các trang liên quan với kiểm tra quyền
   const handleViewProducts = () => {
-    navigate("/admin/list-products");
+    if (["admin", "business", "stockkeeper"].includes(userRole)) {
+      navigate("/admin/list-products");
+    } else {
+      toast.error("Bạn không có quyền truy cập trang này!");
+    }
   };
 
   const handleViewSales = () => {
-    navigate("/admin/sales-management");
+    if (["admin", "sales", "business"].includes(userRole)) {
+      navigate("/admin/sales-management");
+    } else {
+      toast.error("Bạn không có quyền truy cập trang này!");
+    }
   };
 
   const handleViewRevenue = () => {
-    navigate("/admin/revenue-management");
+    if (["admin", "business"].includes(userRole)) {
+      navigate("/admin/revenue-management");
+    } else {
+      toast.error("Bạn không có quyền truy cập trang này!");
+    }
   };
 
   const handleViewStaff = () => {
-    navigate("/admin/list-members");
+    if (userRole === "admin") {
+      navigate("/admin/list-members");
+    } else {
+      toast.error("Bạn không có quyền truy cập trang này!");
+    }
   };
 
   const handleViewCustomers = () => {
-    navigate("/admin/list-customers");
+    if (userRole === "admin") {
+      navigate("/admin/list-customers");
+    } else {
+      toast.error("Bạn không có quyền truy cập trang này!");
+    }
   };
 
   const handleViewSuppliers = () => {
-    navigate("/admin/list-suppliers");
+    if (["admin", "stockkeeper"].includes(userRole)) {
+      navigate("/admin/list-suppliers");
+    } else {
+      toast.error("Bạn không có quyền truy cập trang này!");
+    }
   };
 
   if (loading) {
@@ -152,6 +178,9 @@ const DashboardContent = () => {
                 <button
                   className="btn btn-light fw-bold px-4 py-2 d-flex align-items-center gap-2 mx-auto"
                   onClick={handleViewProducts}
+                  disabled={
+                    !["admin", "business", "stockkeeper"].includes(userRole)
+                  }
                 >
                   <i className="bi bi-list-ul"></i> Xem danh sách sản phẩm
                 </button>
@@ -186,6 +215,7 @@ const DashboardContent = () => {
                 <button
                   className="btn btn-light fw-bold px-4 py-2 d-flex align-items-center gap-2 mx-auto"
                   onClick={handleViewRevenue}
+                  disabled={!["admin", "business"].includes(userRole)}
                 >
                   <i className="bi bi-bar-chart-fill"></i> Xem chi tiết doanh
                   thu
@@ -216,6 +246,7 @@ const DashboardContent = () => {
                 <button
                   className="btn btn-light fw-bold px-4 py-2 d-flex align-items-center gap-2 mx-auto"
                   onClick={handleViewSales}
+                  disabled={!["admin", "sales", "business"].includes(userRole)}
                 >
                   <i className="bi bi-cart-fill"></i> Xem quản lý bán hàng
                 </button>
@@ -245,6 +276,7 @@ const DashboardContent = () => {
                 <button
                   className="btn btn-light fw-bold px-4 py-2 d-flex align-items-center gap-2 mx-auto"
                   onClick={handleViewStaff}
+                  disabled={userRole !== "admin"}
                 >
                   <i className="bi bi-person-lines-fill"></i> Xem danh sách nhân
                   viên
@@ -275,6 +307,7 @@ const DashboardContent = () => {
                 <button
                   className="btn btn-light fw-bold px-4 py-2 d-flex align-items-center gap-2 mx-auto"
                   onClick={handleViewCustomers}
+                  disabled={userRole !== "admin"}
                 >
                   <i className="bi bi-person-lines-fill"></i> Xem danh sách
                   khách hàng
@@ -305,6 +338,7 @@ const DashboardContent = () => {
                 <button
                   className="btn btn-light fw-bold px-4 py-2 d-flex align-items-center gap-2 mx-auto"
                   onClick={handleViewSuppliers}
+                  disabled={!["admin", "stockkeeper"].includes(userRole)}
                 >
                   <i className="bi bi-list-ul"></i> Xem danh sách nhà cung cấp
                 </button>
